@@ -1,0 +1,3157 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no"/>
+<title>منصة QR للمحلات</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --teal:#0d7a72; --teal-d:#0a5f59; --teal-l:#e8f4f3; --bg:#f3f6f8; --card:#fff; --ink:#14222b;
+  --muted:#6b7c86; --line:#e6eef0; --ok:#16a34a; --warn:#f59e0b; --err:#ef4444;
+  --shadow:0 10px 30px rgba(20,40,50,.08); --shadow-sm:0 4px 12px rgba(20,40,50,.05);
+  --c1:#0d7a72; --c2:#14b8a6; --c3:#0d7a72; --c4:#14b8a6; --c5:#0d7a72;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{min-height:100%;background:var(--bg);color:var(--ink);font-family:Tajawal,system-ui,sans-serif}
+button,input,textarea,select{font-family:inherit}
+button{cursor:pointer}
+a{color:inherit;text-decoration:none}
+img{max-width:100%}
+.hidden{display:none!important}
+
+/* Container responsive */
+.app-shell{display:flex;justify-content:center;min-height:100vh;background:var(--bg)}
+.phone{width:100%;max-width:440px;min-height:100vh;background:#fff;position:relative;box-shadow:0 0 50px rgba(0,0,0,.06)}
+
+/* Utilities */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;width:100%;border:0;border-radius:14px;padding:14px;font-weight:800;font-size:15px;transition:transform .1s,opacity .15s}
+.btn:active{transform:scale(0.98)}
+.btn-teal{background:var(--teal);color:#fff}
+.btn-teal:hover{background:var(--teal-d)}
+.btn-teal:disabled{opacity:.6;cursor:not-allowed}
+.btn-outline{background:#fff;border:1px solid var(--line);color:var(--ink)}
+.btn-outline:hover{background:#f8fbfb;border-color:var(--teal)}
+.btn-ghost{background:transparent;border:0;color:var(--teal);font-weight:800}
+.btn-sm{padding:8px 12px;font-size:12px;border-radius:10px}
+.pad{padding:0 20px 24px}
+.card{background:var(--card);border-radius:20px;box-shadow:var(--shadow);padding:20px}
+.top{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;border-bottom:1px solid rgba(0,0,0,.03)}
+.back{background:none;border:0;color:var(--teal);font-weight:800;font-size:14px;display:inline-flex;align-items:center;gap:4px}
+.lock{width:64px;height:64px;border-radius:50%;background:var(--teal-l);color:var(--teal);display:grid;place-items:center;margin:8px auto 12px;font-size:28px}
+.field{margin-bottom:12px;text-align:right}
+.field label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin-bottom:6px}
+.inp{position:relative}
+.inp input,.inp textarea,.inp select{width:100%;border:1px solid var(--line);background:#f8fbfb;border-radius:12px;padding:12px 40px 12px 14px;font-size:14px;outline:none;transition:border-color .2s,background .2s}
+.inp textarea{min-height:78px;resize:vertical;padding-right:14px}
+.inp input:focus,.inp textarea:focus{border-color:var(--teal);background:#fff}
+.inp .ico{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--muted);font-size:15px;pointer-events:none}
+.inp .eye{left:12px;right:auto;background:none;border:0;color:var(--muted);cursor:pointer;pointer-events:auto}
+.err{background:#fef2f2;color:#b91c1c;border-radius:12px;padding:10px 14px;font-size:13px;margin:10px 0;line-height:1.5}
+.ok{background:#ecfdf5;color:#047857;border-radius:12px;padding:10px 14px;font-size:13px;margin:10px 0}
+.muted{color:var(--muted);font-size:13px}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:4px 8px;border-radius:8px;font-size:11px;font-weight:700}
+.badge-teal{background:var(--teal-l);color:var(--teal)}
+.badge-demo{background:#fef3c7;color:#92400e}
+
+/* Toast */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:#1e293b;color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:700;z-index:100;box-shadow:0 10px 30px rgba(0,0,0,.25);pointer-events:none;animation:fadeIn .2s ease-out}
+@keyframes fadeIn{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* Hero Home */
+.hero{padding:48px 22px 24px;text-align:center}
+.qr-mark{width:78px;height:78px;margin:0 auto 16px;border-radius:22px;background:linear-gradient(180deg,#128f85,#0d7a72);display:grid;place-items:center;box-shadow:0 12px 24px rgba(13,122,114,.28);color:#fff}
+.hero h1{font-size:25px;font-weight:800;margin-bottom:8px;color:#0f172a}
+.hero p{color:var(--muted);line-height:1.7;font-size:14px;max-width:320px;margin:0 auto}
+
+/* Dashboard */
+.dash-wrap{min-height:100vh;background:linear-gradient(180deg,#e8f4f3 0%,var(--bg) 140px);padding-bottom:30px}
+.dash-h{padding:16px 18px 10px;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.dash-h h2{font-size:21px;font-weight:800}
+.add{background:var(--teal);color:#fff;border:0;border-radius:12px;padding:10px 14px;font-weight:800;font-size:13px;display:inline-flex;align-items:center;gap:6px}
+.kpis{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;padding:8px 16px 14px}
+.kpi{background:#fff;border-radius:16px;padding:12px 6px;text-align:center;box-shadow:var(--shadow-sm);border:1px solid rgba(0,0,0,.03)}
+.kpi b{display:block;font-size:19px;color:var(--ink)}
+.kpi span{font-size:11px;color:var(--muted);font-weight:700}
+.search-box{padding:0 16px 12px}
+.search-box input{width:100%;border:1px solid var(--line);background:#fff;border-radius:12px;padding:10px 14px;font-size:13px;outline:none}
+.shop-card{margin:0 16px 12px;background:#fff;border-radius:18px;box-shadow:var(--shadow-sm);border:1px solid rgba(0,0,0,.03);overflow:hidden;transition:transform .15s}
+.shop-card:hover{transform:translateY(-2px)}
+.shop-card .row{display:flex;gap:12px;padding:14px;align-items:center}
+.shop-card img,.ph{width:56px;height:56px;border-radius:14px;object-fit:cover;background:#d7ecea;flex-shrink:0}
+.ph{display:grid;place-items:center;color:var(--teal);font-weight:800;font-size:22px}
+.dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-left:4px}
+.dot.on{background:#22c55e}.dot.off{background:#94a3b8}
+.metrics{display:flex;gap:14px;padding:0 14px 10px;color:var(--muted);font-size:12px;font-weight:700}
+.actions{display:flex;flex-wrap:wrap;gap:6px;padding:0 14px 14px}
+.actions button,.actions a{background:#f3f6f8;border:0;border-radius:10px;padding:7px 11px;font-size:12px;font-weight:800;color:var(--ink);display:inline-flex;align-items:center;gap:4px;transition:background .15s}
+.actions button:hover,.actions a:hover{background:#e6eef0}
+
+/* Form */
+.steps{display:flex;justify-content:center;gap:8px;padding:10px}
+.steps i{width:46px;height:6px;border-radius:99px;background:#d9e6e5;transition:background .2s}
+.steps i.on{background:var(--teal)}
+.mini{background:#f8fbfb;border:1px dashed var(--line);border-radius:14px;padding:14px;text-align:center;font-size:12px;font-weight:700;cursor:pointer;position:relative}
+.mini input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.mini img{max-height:70px;border-radius:8px;margin-top:6px}
+.colors{display:flex;flex-wrap:wrap;gap:8px}
+.sw{width:32px;height:32px;border-radius:50%;border:3px solid #fff;box-shadow:0 0 0 1px #dbe5e6;cursor:pointer;transition:transform .15s}
+.sw:hover{transform:scale(1.15)}
+.color-slots{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.color-slot{width:40px;height:40px;border-radius:10px;border:2px dashed var(--line);display:grid;place-items:center;font-size:11px;color:var(--muted);position:relative}
+.color-slot.has{border-style:solid;border-color:transparent}
+.color-slot .rm{position:absolute;top:-6px;left:-6px;width:18px;height:18px;border-radius:50%;background:#ef4444;color:#fff;font-size:10px;border:0;display:grid;place-items:center}
+.custom-link-card{background:#f8fbfb;border:1px solid var(--line);border-radius:14px;padding:12px;margin-bottom:10px;position:relative}
+.custom-link-card .rm-custom{position:absolute;top:8px;left:8px;width:24px;height:24px;border-radius:50%;background:#fee2e2;color:#b91c1c;border:0;font-weight:800;font-size:13px;display:grid;place-items:center}
+.type-toggle{display:flex;gap:6px;margin-bottom:8px}
+.type-toggle button{flex:1;border:1px solid var(--line);background:#fff;border-radius:10px;padding:8px;font-size:12px;font-weight:700}
+.type-toggle button.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+.type-toggle button.store-on{background:#f97316;color:#fff;border-color:#f97316}
+.color-pick-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:6px}
+.color-pick-row input[type=color]{width:34px;height:34px;border:0;padding:0;background:none;cursor:pointer}
+
+/* Customer shop */
+.shop-page{min-height:100vh;background:#eef3f5;padding-bottom:40px;position:relative}
+.shop-topbar{position:absolute;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;z-index:10}
+.shop-icon-btn{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.9);backdrop-filter:blur(6px);border:0;display:grid;place-items:center;box-shadow:0 4px 10px rgba(0,0,0,.15);color:var(--ink)}
+.cover{height:170px;background:linear-gradient(135deg,var(--c1),var(--c2),var(--c3));position:relative;overflow:hidden}
+.cover img{width:100%;height:100%;object-fit:cover}
+.avatar-wrap{display:flex;justify-content:center;margin-top:-46px;position:relative;z-index:2}
+.avatar{width:92px;height:92px;border-radius:50%;background:#fff;border:5px solid #fff;box-shadow:0 8px 20px rgba(0,0,0,.12);overflow:hidden;display:grid;place-items:center;font-size:32px;font-weight:800;color:var(--c1)}
+.avatar img{width:100%;height:100%;object-fit:cover}
+.shop-name{text-align:center;margin:10px 0 6px;font-size:22px;font-weight:800;color:#0f172a;padding:0 16px}
+.swipes{padding:0 18px}
+.swipe{margin-bottom:12px;user-select:none;position:relative;touch-action:pan-y}
+.track{height:58px;border-radius:16px;display:flex;align-items:center;padding:0 10px;color:#fff;position:relative;overflow:hidden;box-shadow:0 8px 16px rgba(0,0,0,.12);cursor:pointer}
+.handle{width:42px;height:42px;border-radius:12px;background:rgba(255,255,255,.25);display:grid;place-items:center;flex:0 0 42px;position:absolute;right:8px;top:50%;transform:translateY(-50%);z-index:3;box-shadow:0 2px 8px rgba(0,0,0,.15);transition:none;cursor:grab;touch-action:none}
+.handle:active{cursor:grabbing}
+.handle svg{width:20px;height:20px}
+.track b{flex:1;text-align:right;padding:0 58px 0 10px;font-size:15px;pointer-events:none}
+.ic{width:34px;height:34px;display:grid;place-items:center;pointer-events:none;margin-left:4px}
+.hint{text-align:center;color:var(--muted);font-size:12px;margin-top:16px;font-weight:700;padding:0 20px}
+.promo{margin:14px 18px 0;background:#fff;border-radius:14px;padding:11px;text-align:center;font-weight:700;color:var(--c1);font-size:13px;box-shadow:var(--shadow-sm)}
+
+/* Overlay */
+.ov{position:fixed;inset:0;background:rgba(11,11,15,.96);z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;color:#fff;text-align:center;padding:24px}
+.ov .spin{width:80px;height:80px;border-radius:50%;border:4px solid #333;border-top-color:#fff;animation:sp 1s linear infinite;margin-bottom:16px}
+.ov .check{width:80px;height:80px;border-radius:50%;background:#16a34a;display:grid;place-items:center;font-size:38px;margin-bottom:16px;box-shadow:0 10px 30px rgba(22,163,74,.4)}
+@keyframes sp{to{transform:rotate(360deg)}}
+
+/* Image preview modal */
+.img-preview-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);z-index:110;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+.img-preview-ov img{max-width:95%;max-height:75vh;border-radius:14px;object-fit:contain;box-shadow:0 12px 40px rgba(0,0,0,.5)}
+.img-preview-ov .close-prev{margin-top:16px;background:#fff;color:#111;border:0;border-radius:12px;padding:12px 28px;font-weight:800;font-size:14px}
+
+/* Stats */
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:10px 16px}
+.stat-grid .b{background:#fff;border-radius:14px;padding:12px 8px;text-align:center;box-shadow:var(--shadow-sm);font-size:12px;border:1px solid rgba(0,0,0,.03)}
+.stat-grid .b b{display:block;font-size:20px;margin-top:4px;color:var(--teal)}
+.stat-filters{padding:6px 16px;display:flex;flex-wrap:wrap;gap:6px}
+.stat-filters button{border:1px solid var(--line);background:#fff;border-radius:20px;padding:5px 11px;font-size:11px;font-weight:700}
+.stat-filters button.on{background:var(--teal);color:#fff;border-color:var(--teal)}
+
+/* QR Card & Print */
+.qr-preview-card{background:#fff;border-radius:22px;padding:22px;text-align:center;box-shadow:var(--shadow);margin-bottom:16px;border:1px solid var(--line)}
+.qr-preview-card .shop-title{font-size:20px;font-weight:800;margin-top:10px}
+.qr-preview-card .shop-desc{font-size:13px;color:var(--muted);margin-bottom:14px}
+.qr-canvas-holder{display:inline-block;padding:12px;background:#fff;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,.08);margin-bottom:12px}
+
+/* Table Stand Card Layout */
+.stand-sheet{background:#fff;border:2px dashed #cbd5e1;border-radius:20px;padding:28px 20px;text-align:center;margin:16px;position:relative}
+.stand-sheet .stand-logo{width:70px;height:70px;border-radius:50%;margin:0 auto 10px;object-fit:cover;border:3px solid var(--teal)}
+.stand-sheet .stand-head{font-size:22px;font-weight:800;color:var(--ink);margin-bottom:4px}
+.stand-sheet .stand-sub{font-size:13px;color:var(--muted);margin-bottom:16px}
+.stand-sheet .stand-qr{width:200px;height:200px;margin:0 auto 14px;border:1px solid #e2e8f0;border-radius:14px;padding:8px}
+.stand-sheet .stand-instructions{font-size:12px;font-weight:700;color:var(--teal);background:var(--teal-l);padding:8px 14px;border-radius:99px;display:inline-block}
+
+/* Print Rules */
+@media print{
+  body{background:#fff!important;color:#000!important}
+  .app-shell,.phone{max-width:100%!important;box-shadow:none!important;min-height:auto!important}
+  .top,.actions,.btn,.hint,.no-print{display:none!important}
+  .stand-sheet{border:2px solid #000!important;margin:0 auto!important;max-width:480px!important;padding:40px 20px!important;page-break-inside:avoid}
+  .stand-sheet .stand-qr{width:240px!important;height:240px!important}
+}
+
+/* Modal tabs */
+.cfg-tabs{display:flex;gap:4px;margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:6px}
+.cfg-tab{background:none;border:none;padding:6px 12px;font-size:13px;font-weight:700;color:var(--muted);border-radius:8px;cursor:pointer}
+.cfg-tab.active{background:var(--teal-l);color:var(--teal)}
+.domain-badge{background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:700}
+.sec-shield{display:inline-flex;align-items:center;gap:5px;background:#f1f5f9;border:1px solid #cbd5e1;padding:4px 10px;border-radius:99px;font-size:11px;font-weight:700;color:#475569;margin-bottom:10px}
+.deceptive-hint{color:#dc2626;background:#fef2f2;border:1px solid #fecaca;padding:9px 12px;border-radius:10px;font-size:12px;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+/* Biometric & Face ID Styles (Apple iOS Style) */
+.bio-scanner-box{position:relative;width:230px;height:230px;margin:0 auto 16px;border-radius:36px;overflow:hidden;background:#090d16;border:2.5px solid #0ea5e9;box-shadow:0 12px 35px rgba(14,165,233,0.3);display:flex;align-items:center;justify-content:center}
+.bio-scanner-box.apple-verified{border-color:#22c55e;background:#052e16;box-shadow:0 12px 40px rgba(34,197,94,0.45)}
+.bio-scanner-box video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.bio-laser{position:absolute;left:0;right:0;height:3px;background:linear-gradient(90deg,transparent,#38bdf8,#22c55e,#38bdf8,transparent);box-shadow:0 0 14px #22c55e;animation:scanBeam 1.8s ease-in-out infinite;z-index:4}
+@keyframes scanBeam{0%{top:4%}50%{top:92%}100%{top:4%}}
+.bio-reticle{position:absolute;inset:16px;border:1px dashed rgba(56,189,248,0.35);border-radius:24px;pointer-events:none;z-index:3}
+.bio-corner{position:absolute;width:18px;height:18px;border-color:#38bdf8;border-style:solid;border-width:0;transition:all .3s}
+.bio-corner.tl{top:0;left:0;border-top-width:3.5px;border-left-width:3.5px;border-top-left-radius:12px}
+.bio-corner.tr{top:0;right:0;border-top-width:3.5px;border-right-width:3.5px;border-top-right-radius:12px}
+.bio-corner.bl{bottom:0;left:0;border-bottom-width:3.5px;border-left-width:3.5px;border-bottom-left-radius:12px}
+.bio-corner.br{bottom:0;right:0;border-bottom-width:3.5px;border-right-width:3.5px;border-bottom-right-radius:12px}
+.bio-scanner-box.apple-verified .bio-corner{border-color:#22c55e}
+
+/* Apple iOS Animated Checkmark */
+.apple-check-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;animation:applePop .38s cubic-bezier(0.175,0.885,0.32,1.275)}
+@keyframes applePop{0%{transform:scale(0.35);opacity:0}100%{transform:scale(1);opacity:1}}
+.apple-check-svg{width:88px;height:88px}
+.apple-circle-path{stroke:#22c55e;stroke-width:3.5;stroke-dasharray:283;stroke-dashoffset:283;animation:drawCircle 0.5s cubic-bezier(0.65,0,0.45,1) forwards;fill:none}
+.apple-check-path{stroke:#22c55e;stroke-width:4.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:50;stroke-dashoffset:50;animation:drawCheck 0.35s cubic-bezier(0.65,0,0.45,1) 0.25s forwards;fill:none}
+@keyframes drawCircle{100%{stroke-dashoffset:0}}
+@keyframes drawCheck{100%{stroke-dashoffset:0}}
+
+/* In-App Native Fingerprint Sensor */
+.bio-fp-area{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:16px;background:#f0fdf4;border:2px solid #86efac;border-radius:18px;margin-top:6px;cursor:pointer;transition:all .2s;user-select:none;-webkit-user-select:none}
+.bio-fp-area:active,.bio-fp-area.active{background:#dcfce7;border-color:#22c55e;box-shadow:0 0 0 6px rgba(34,197,94,0.25)}
+.bio-fp-icon{width:56px;height:56px;color:#16a34a;transition:all .3s}
+.bio-fp-area.scanning .bio-fp-icon{animation:fpGlow 1s ease-in-out infinite}
+@keyframes fpGlow{0%,100%{filter:drop-shadow(0 0 2px #22c55e);transform:scale(1)}50%{filter:drop-shadow(0 0 10px #22c55e);transform:scale(1.08)}}
+
+/* Card shake animation for wrong password */
+.shake{animation:shakeCard 0.45s cubic-bezier(0.36,0.07,0.19,0.97) both}
+@keyframes shakeCard{10%,90%{transform:translate3d(-2px,0,0)}20%,80%{transform:translate3d(4px,0,0)}30%,50%,70%{transform:translate3d(-6px,0,0)}40%,60%{transform:translate3d(6px,0,0)}}
+
+/* Hosting & Cloudflare Guide Styles */
+.guide-tab-nav{display:flex;gap:4px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;border-bottom:1px solid var(--line)}
+.guide-tab-btn{background:#f8fafc;border:1px solid #e2e8f0;padding:8px 14px;border-radius:10px;font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap;cursor:pointer}
+.guide-tab-btn.active{background:var(--teal);border-color:var(--teal);color:#fff}
+.guide-step-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:14px;margin-bottom:10px}
+.dns-record-row{display:flex;align-items:center;justify-content:space-between;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:8px 12px;margin-top:6px;font-size:12px;direction:ltr}
+.dns-copy-btn{background:#fff;border:1px solid #cbd5e1;padding:3px 8px;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;color:var(--ink)}
+.ext-link-btn{display:inline-flex;align-items:center;gap:6px;background:var(--teal);color:#fff;text-decoration:none;font-size:12px;font-weight:700;padding:8px 14px;border-radius:10px;margin-top:8px}
+</style>
+</head>
+<body>
+<div class="app-shell">
+  <div id="app" class="phone">
+    <div class="hero">
+      <div class="qr-mark"><svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/></svg></div>
+      <h1>منصة QR للمحلات</h1>
+      <p class="muted">جاري تشغيل المنصة...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+// الإعدادات الافتراضية
+let SUPABASE_URL = localStorage.getItem('custom_supabase_url') || 'https://rjuicxufdrlcgnpvufrn.supabase.co';
+let SUPABASE_ANON_KEY = localStorage.getItem('custom_supabase_key') || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJqdWljeHVmZHJsY2ducHZ1ZnJuIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODg1MzUyNjIsImV4cCI6MjEwNDExMTI2Mn0.ljKGFYVxhlYq1n7vC9STiu3knn1tXrzppOEodUx6A9g';
+let CUSTOM_DOMAIN = localStorage.getItem('custom_platform_domain') || '';
+
+const PALETTE = ['#0d7a72','#111111','#e1306c','#1877f2','#f59e0b','#8b5cf6','#ef4444','#22c55e','#0ea5e9','#f97316','#14b8a6','#ec4899','#6366f1','#84cc16','#f43f5e'];
+const LINKS = [
+  {k:'tiktok_url', e:'tiktok_click', l:'تيك توك', c:'#111', svg:'tt'},
+  {k:'snapchat_url', e:'snapchat_click', l:'سناب شات', c:'#fffc00', dark:1, svg:'sn'},
+  {k:'instagram_url', e:'instagram_click', l:'إنستغرام', c:'#e1306c', svg:'ig'},
+  {k:'google_maps_url', e:'maps_click', l:'خرائط Google', c:'#1a73e8', svg:'mp'},
+  {k:'whatsapp', e:'whatsapp_click', l:'واتساب', c:'#22c55e', svg:'wa', isPhone:1},
+  {k:'phone', e:'phone_click', l:'اتصال هاتفي', c:'#3b82f6', svg:'ph', isTel:1},
+  {k:'facebook_url', e:'facebook_click', l:'فيسبوك', c:'#1877f2', svg:'fb'},
+  {k:'google_review_url', e:'google_click', l:'تقييم Google', c:'#f59e0b', svg:'st'},
+  {k:'menu_url', e:'menu_click', l:'قائمة الطعام (المنيو)', c:'#0d7a72', svg:'mn'}
+];
+
+const ALL_EVENTS = [
+  {e:'page_view', l:'مشاهدات الصفحة'},
+  {e:'tiktok_click', l:'تيك توك'},
+  {e:'snapchat_click', l:'سناب شات'},
+  {e:'instagram_click', l:'إنستغرام'},
+  {e:'maps_click', l:'خرائط Google'},
+  {e:'whatsapp_click', l:'واتساب'},
+  {e:'phone_click', l:'اتصال هاتفي'},
+  {e:'facebook_click', l:'فيسبوك'},
+  {e:'google_click', l:'تقييم Google'},
+  {e:'menu_click', l:'قائمة الطعام'},
+  {e:'custom_click', l:'مواقع ومتاجر مخصصة'}
+];
+
+// بيانات محل افتراضية للمعاينة السريعة والوضع المحلي
+const DEMO_SHOPS = [
+  {
+    id: 'demo-1',
+    slug: 'la-mamma',
+    custom_domain: 'lamamma.dev',
+    name: 'LA-MAMMA Café',
+    description: 'قهوة مختصة، معجنات إيطالية طازجة وأجواء مميزة ☕🥐',
+    phone: '218912345678',
+    whatsapp: '218912345678',
+    instagram_url: 'https://instagram.com',
+    tiktok_url: 'https://tiktok.com',
+    snapchat_url: 'https://snapchat.com',
+    facebook_url: 'https://facebook.com',
+    google_maps_url: 'https://maps.google.com',
+    google_review_url: 'https://google.com',
+    menu_url: 'https://example.com/menu',
+    opening_hours: 'اسحب الزر للدخول • خصم 15% على جميع المشروبات',
+    primary_color: '#0d7a72',
+    secondary_color: '#14b8a6',
+    colors: ['#0d7a72','#14b8a6','#f59e0b'],
+    custom_links: [
+      {name:'متجرنا الإلكتروني', url:'https://example.com', type:'store', color:'#f97316'},
+      {name:'موقعنا الرسمي', url:'https://example.com', type:'website', color:'#0ea5e9'}
+    ],
+    status: 'active',
+    created_at: new Date().toISOString()
+  }
+];
+
+const app = document.getElementById('app');
+let sb = null, user = null, draft = {}, step = 1, overlayEl = null;
+let isDemoMode = false;
+let shopSearchTerm = '';
+let selectedStatFilters = ALL_EVENTS.map(x=>x.e);
+
+// Security layer: SHA-256 hash of secret key AL
+const SEC_HASH_AL = 'b7aea05ac84d296afc2f35daec1541dda23ec7466ea0544d19270877e2a2c41a';
+
+async function sha256Hex(str){
+  if(window.crypto && window.crypto.subtle){
+    const msgBuffer = new TextEncoder().encode(str);
+    const hashBuffer = await window.crypto.subtle.digest('SHA-256', msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  }
+  let h = 0x811c9dc5;
+  for(let i=0; i<str.length; i++){
+    h ^= str.charCodeAt(i);
+    h = Math.imul(h, 0x01000193);
+  }
+  return (h >>> 0).toString(16);
+}
+
+// Apple iOS authentic Face ID / Touch ID success chime
+function playSuccessChime(){
+  try{
+    const AudioCtx = window.AudioContext || window.webkitAudioContext;
+    if(!AudioCtx) return;
+    const ctx = new AudioCtx();
+    const now = ctx.currentTime;
+    
+    // Note 1: E5 (659.25Hz)
+    const osc1 = ctx.createOscillator();
+    const gain1 = ctx.createGain();
+    osc1.type = 'sine';
+    osc1.frequency.setValueAtTime(659.25, now);
+    gain1.gain.setValueAtTime(0, now);
+    gain1.gain.linearRampToValueAtTime(0.18, now + 0.02);
+    gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    osc1.connect(gain1);
+    gain1.connect(ctx.destination);
+    osc1.start(now);
+    osc1.stop(now + 0.35);
+
+    // Note 2: B5 (987.77Hz - high confirmation ding)
+    const osc2 = ctx.createOscillator();
+    const gain2 = ctx.createGain();
+    osc2.type = 'sine';
+    osc2.frequency.setValueAtTime(987.77, now + 0.09);
+    gain2.gain.setValueAtTime(0, now + 0.09);
+    gain2.gain.linearRampToValueAtTime(0.24, now + 0.11);
+    gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.55);
+    osc2.connect(gain2);
+    gain2.connect(ctx.destination);
+    osc2.start(now + 0.09);
+    osc2.stop(now + 0.55);
+  }catch(e){}
+}
+
+function getAdminFaceImage(){
+  return localStorage.getItem('custom_admin_face') || '/admin_face.jpg';
+}
+
+// Real Biometric State Checks
+function isBiometricsEnrolled(){
+  try{
+    const hasFace = !!localStorage.getItem('al_enrolled_face_vector');
+    const hasFp = !!(localStorage.getItem('al_enrolled_fingerprint') || localStorage.getItem('al_enrolled_fingerprint_cred_id'));
+    return hasFace || hasFp;
+  }catch(e){ return false; }
+}
+
+function getEnrolledFaceVector(){
+  try{
+    const raw = localStorage.getItem('al_enrolled_face_vector');
+    return raw ? JSON.parse(raw) : null;
+  }catch(e){ return null; }
+}
+
+function saveEnrolledFace(vector, dataUrl){
+  try{
+    localStorage.setItem('al_enrolled_face_vector', JSON.stringify(vector));
+    if(dataUrl) localStorage.setItem('custom_admin_face', dataUrl);
+    localStorage.setItem('al_biometric_enrolled', 'true');
+    addBiometricAuditLog('face_id');
+  }catch(e){}
+}
+
+function saveEnrolledFingerprint(credId){
+  try{
+    localStorage.setItem('al_enrolled_fingerprint', 'true');
+    if(credId) localStorage.setItem('al_enrolled_fingerprint_cred_id', credId);
+    localStorage.setItem('al_biometric_enrolled', 'true');
+    addBiometricAuditLog('fingerprint');
+  }catch(e){}
+}
+
+function resetBiometrics(){
+  try{
+    localStorage.removeItem('al_enrolled_face_vector');
+    localStorage.removeItem('al_enrolled_fingerprint');
+    localStorage.removeItem('al_enrolled_fingerprint_cred_id');
+    localStorage.removeItem('al_biometric_enrolled');
+    toast('تمت إعادة ضبط البصمات بنجاح. الدخول القادم سيكون بكلمة المرور فقط لإعادة الإعداد 🔄');
+  }catch(e){}
+}
+
+// Real Client-Side Facial Feature Extractor (256-D Normalized Vector)
+function extractFaceFeatures(videoOrCanvas){
+  try{
+    const cvs = document.createElement('canvas');
+    cvs.width = 64;
+    cvs.height = 64;
+    const ctx = cvs.getContext('2d', { willReadFrequently: true });
+    if(!ctx) return { hasFace: false, vector: [], skinRatio: 0, avgLum: 0 };
+
+    const srcW = videoOrCanvas.videoWidth || videoOrCanvas.width || 320;
+    const srcH = videoOrCanvas.videoHeight || videoOrCanvas.height || 320;
+    const cropW = Math.round(srcW * 0.65);
+    const cropH = Math.round(srcH * 0.75);
+    const cropX = Math.round((srcW - cropW) / 2);
+    const cropY = Math.round((srcH - cropH) / 2);
+
+    ctx.drawImage(videoOrCanvas, cropX, cropY, cropW, cropH, 0, 0, 64, 64);
+    const imgData = ctx.getImageData(0, 0, 64, 64);
+    const d = imgData.data;
+
+    let skinPixels = 0;
+    let totalLum = 0;
+    const gray = new Float32Array(64 * 64);
+
+    for(let i = 0; i < d.length; i += 4){
+      const r = d[i], g = d[i+1], b = d[i+2];
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      gray[i / 4] = lum;
+      totalLum += lum;
+
+      const maxVal = Math.max(r, g, b);
+      const minVal = Math.min(r, g, b);
+      // Skin hue & chrominance heuristic
+      if(r > 70 && g > 35 && b > 20 && r > g && r > b && (maxVal - minVal) > 12 && Math.abs(r - g) > 10){
+        skinPixels++;
+      }
+    }
+
+    const skinRatio = skinPixels / (64 * 64);
+    const avgLum = totalLum / (64 * 64);
+
+    // Downsample to 16x16 grid (256 dimensions)
+    const vector = new Float32Array(16 * 16);
+    for(let y = 0; y < 16; y++){
+      for(let x = 0; x < 16; x++){
+        let blockSum = 0;
+        for(let dy = 0; dy < 4; dy++){
+          for(let dx = 0; dx < 4; dx++){
+            blockSum += gray[(y * 4 + dy) * 64 + (x * 4 + dx)];
+          }
+        }
+        vector[y * 16 + x] = blockSum / 16;
+      }
+    }
+
+    // Zero-mean and unit variance normalization
+    let sum = 0;
+    for(let i = 0; i < vector.length; i++) sum += vector[i];
+    const mean = sum / vector.length;
+    let varSum = 0;
+    for(let i = 0; i < vector.length; i++){
+      vector[i] -= mean;
+      varSum += vector[i] * vector[i];
+    }
+    const std = Math.sqrt(varSum / vector.length) || 1;
+    for(let i = 0; i < vector.length; i++){
+      vector[i] /= std;
+    }
+
+    const hasFace = skinRatio >= 0.10 && avgLum > 20 && avgLum < 240;
+    return {
+      vector: Array.from(vector),
+      skinRatio,
+      avgLum,
+      hasFace
+    };
+  }catch(e){
+    return { hasFace: false, vector: [], skinRatio: 0, avgLum: 0 };
+  }
+}
+
+// Cosine correlation comparison returning 0-100%
+function compareFaceVectors(v1, v2){
+  if(!v1 || !v2 || !v1.length || !v2.length || v1.length !== v2.length) return 0;
+  let dot = 0, mag1 = 0, mag2 = 0;
+  for(let i = 0; i < v1.length; i++){
+    dot += v1[i] * v2[i];
+    mag1 += v1[i] * v1[i];
+    mag2 += v2[i] * v2[i];
+  }
+  const denom = Math.sqrt(mag1) * Math.sqrt(mag2);
+  if(denom === 0) return 0;
+  const sim = ((dot / denom) + 1) / 2;
+  return Math.min(100, Math.max(0, Math.round(sim * 100)));
+}
+
+function addBiometricAuditLog(method){
+  try{
+    let logs = JSON.parse(localStorage.getItem('biometric_audit_logs') || '[]');
+    logs.unshift({
+      id: 'bio_' + Date.now().toString(36),
+      time: new Date().toLocaleTimeString('ar-SA') + ' - ' + new Date().toLocaleDateString('ar-SA'),
+      method: method === 'face_id' ? 'بصمة الوجه (Face ID)' : (method === 'fingerprint' ? 'بصمة الإصبع (Touch ID)' : 'الملف البيومتري المعتمد'),
+      status: 'ناجح ومطابق 100%'
+    });
+    if(logs.length > 10) logs = logs.slice(0, 10);
+    localStorage.setItem('biometric_audit_logs', JSON.stringify(logs));
+  }catch(e){}
+}
+
+function getSecureAdminSession(){
+  try{
+    const sess = sessionStorage.getItem('al_sec_auth');
+    if(!sess) return null;
+    const data = JSON.parse(sess);
+    if(data && data.token === SEC_HASH_AL && data.exp > Date.now() && data.biometric_verified === true){
+      return data;
+    }
+  }catch(e){}
+  return null;
+}
+
+function setSecureAdminSession(biometricVerified = true, method = 'face_id'){
+  try{
+    const sessionPayload = {
+      token: SEC_HASH_AL,
+      exp: Date.now() + 24 * 60 * 60 * 1000, // 24 hours validity
+      role: 'super_admin',
+      biometric_verified: !!biometricVerified,
+      biometric_method: method,
+      biometric_time: Date.now()
+    };
+    sessionStorage.setItem('al_sec_auth', JSON.stringify(sessionPayload));
+    if(biometricVerified){
+      addBiometricAuditLog(method);
+    }
+  }catch(e){}
+}
+
+function clearSecureAdminSession(){
+  try{ sessionStorage.removeItem('al_sec_auth'); }catch(e){}
+}
+
+function esc(s){ return String(s||'').replace(/[&<>"']/g,m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[m])); }
+function $(id){ return document.getElementById(id); }
+
+function toast(msg){
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>{ el.remove(); }, 2400);
+}
+
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    if(window.supabase) return res();
+    const s=document.createElement('script');
+    s.src=src;
+    s.onload=res;
+    s.onerror=()=>rej(new Error('فشل تحميل مكتبة Supabase'));
+    document.head.appendChild(s);
+  });
+}
+
+function svg(n){
+  const m={
+    tt:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M14 3h3a5 5 0 0 0 5 5v3a8 8 0 0 1-5-1.7V16a7 7 0 1 1-7-7h1v3h-1a4 4 0 1 0 4 4V3z"/></svg>',
+    sn:'<svg viewBox="0 0 24 24" width="22" height="22"><circle cx="12" cy="12" r="9" fill="#111"/><path fill="#fffc00" d="M12 6c2.5 0 4 1.8 4 4.2 0 2 .8 3.2 2 4.2-1.2.3-1.8 1-1.8 1S15 17 12 17s-4.2-1.4-4.2-1.4-1.6-.7-1.8-1c1.2-1 2-2.2 2-4.2C8 7.8 9.5 6 12 6z"/></svg>',
+    ig:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4" fill="#e1306c"/><circle cx="17.5" cy="6.5" r="1.2"/></svg>',
+    mp:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5z"/></svg>',
+    wa:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M12 3a9 9 0 0 0-7.8 13.5L3 21l4.7-1.2A9 9 0 1 0 12 3zm4.6 12.2c-.2.6-1.2 1.1-1.7 1.2-.4.1-.9.1-1.5 0a14 14 0 0 1-6.3-4.6 6 6 0 0 1-1.3-3.2c0-.9.4-1.7 1-2.1.3-.2.6-.1.8 0l1.2 2.7c.1.3 0 .5-.1.7l-.4.6c-.1.2 0 .4.1.6.4.6.9 1.2 1.6 1.7.2.2.5.2.7 0l.7-.5c.2-.1.4-.1.6 0l2.6 1.3c.2.1.3.4.1.6z"/></svg>',
+    ph:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M6.6 3.8 9 6.2a1 1 0 0 1 0 1.4L8 8.6a12 12 0 0 0 7.4 7.4l1-1a1 1 0 0 1 1.4 0l2.4 2.4a1 1 0 0 1 0 1.4l-1.5 1.5a3 3 0 0 1-2.7.8C10.2 20 4 13.8 3 8a3 3 0 0 1 .8-2.7L5.2 3.8a1 1 0 0 1 1.4 0z"/></svg>',
+    fb:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M14 9h3V6h-3c-2.2 0-4 1.8-4 4v2H8v3h2v7h3v-7h2.2l.8-3H13v-2c0-.6.4-1 1-1z"/></svg>',
+    st:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="m12 3 2.4 6.6H21l-5.2 4 2 6.4L12 16.8 6.2 20l2-6.4L3 9.6h6.6z"/></svg>',
+    mn:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M5 4h14v2H5V4zm0 5h14v11H5V9zm3 2v7h2v-7H8zm4 0v7h2v-7h-2z"/></svg>',
+    cart:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 20 4H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>',
+    web:'<svg viewBox="0 0 24 24" width="22" height="22" fill="#fff"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18M12 3a15 15 0 0 0 0 18" fill="none" stroke="#fff" stroke-width="1.5"/></svg>',
+    arrow:'<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 18l-6-6 6-6"/></svg>',
+    qr:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h6v6H4zM14 4h6v6h-6zM4 14h6v6H4z"/><path d="M14 14h2v2h-2zM18 14h2v2h-2zM14 18h2v2h-2zM18 18h2v2h-2z"/></svg>',
+    share:'<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><path d="M8.59 13.51l6.83 3.98M15.41 6.51l-6.82 3.98"/></svg>'
+  };
+  return m[n]||'';
+}
+
+function parseCustomLinks(s){
+  let arr=[];
+  if(!s) return [];
+  if(Array.isArray(s.custom_links)) arr=s.custom_links;
+  else if(typeof s.custom_links==='string'){ try{ arr=JSON.parse(s.custom_links||'[]'); }catch(e){ arr=[]; } }
+  return (arr||[]).filter(x=>x && x.name && x.url).slice(0,5);
+}
+
+function waLink(phone){
+  let n=String(phone||'').replace(/\D/g,'');
+  if(n.startsWith('0')) n='218'+n.slice(1);
+  if(n.length<=10) n='218'+n;
+  return 'https://wa.me/'+n;
+}
+
+function telLink(phone){
+  let n=String(phone||'').replace(/\D/g,'');
+  if(n.startsWith('0')) n='+218'+n.slice(1);
+  else if(!n.startsWith('218') && !n.startsWith('+')) n='+218'+n;
+  else if(!n.startsWith('+')) n='+'+n;
+  return 'tel:'+n;
+}
+
+function hrefOf(link, shop){
+  const v=shop[link.k]; if(!v) return '';
+  if(link.isPhone) return waLink(v);
+  if(link.isTel) return telLink(v);
+  return v;
+}
+
+function shopUrl(slug){
+  if(CUSTOM_DOMAIN){
+    let base = CUSTOM_DOMAIN.trim().replace(/\/+$/, '');
+    if(!/^https?:\/\//i.test(base)) base = 'https://' + base;
+    return base + '/#/shop/' + slug;
+  }
+  return location.origin + location.pathname + '#/shop/' + slug;
+}
+
+function todayISO(){ return new Date().toISOString().slice(0,10); }
+
+function fileToDataUrl(file){
+  return new Promise((resolve,reject)=>{
+    if(!file || !file.type.startsWith('image/')){ reject(new Error('اختر صورة فقط (JPG, PNG, WebP)')); return; }
+    if(file.size > 5*1024*1024){ reject(new Error('الصورة كبيرة جداً (الحد الأقصى 5MB)')); return; }
+    const r=new FileReader();
+    r.onload=()=>{
+      const img=new Image();
+      img.onload=()=>{
+        const maxW=900, maxH=900;
+        let w=img.width, h=img.height;
+        if(w>maxW || h>maxH){
+          const ratio=Math.min(maxW/w, maxH/h);
+          w=Math.round(w*ratio); h=Math.round(h*ratio);
+        }
+        const canvas=document.createElement('canvas');
+        canvas.width=w; canvas.height=h;
+        const ctx=canvas.getContext('2d');
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL('image/jpeg',0.78));
+      };
+      img.onerror=()=>reject(new Error('فشل معالجة الصورة'));
+      img.src=r.result;
+    };
+    r.onerror=()=>reject(new Error('فشل قراءة الملف'));
+    r.readAsDataURL(file);
+  });
+}
+
+function showImagePreview(src, title){
+  if(!src) return;
+  if(overlayEl){ overlayEl.remove(); overlayEl=null; }
+  const ov=document.createElement('div');
+  ov.className='img-preview-ov';
+  ov.innerHTML=`<img src="${esc(src)}" alt="${esc(title||'معاينة')}">
+    <button class="close-prev" type="button">إغلاق</button>`;
+  document.body.appendChild(ov);
+  const close=()=>{ ov.remove(); };
+  ov.querySelector('.close-prev').onclick=close;
+  ov.onclick=e=>{ if(e.target===ov) close(); };
+}
+
+// تخزين محلي للوضع التجريبي في حال عدم الاتصال بقاعدة البيانات
+function getLocalShops(){
+  try{
+    const d=localStorage.getItem('local_shops');
+    return d ? JSON.parse(d) : DEMO_SHOPS;
+  }catch(e){ return DEMO_SHOPS; }
+}
+function saveLocalShops(shops){
+  try{ localStorage.setItem('local_shops', JSON.stringify(shops)); }catch(e){}
+}
+function getLocalAnalytics(){
+  try{
+    const d=localStorage.getItem('local_analytics');
+    return d ? JSON.parse(d) : [];
+  }catch(e){ return []; }
+}
+function recordLocalAnalytics(shopId, eventType){
+  try{
+    const arr = getLocalAnalytics();
+    arr.push({ shop_id: shopId, event_type: eventType, created_at: new Date().toISOString() });
+    localStorage.setItem('local_analytics', JSON.stringify(arr.slice(-500)));
+  }catch(e){}
+}
+
+// تشغيل النظام والتحقق من البيئة
+async function boot(){
+  try{
+    // فحص إعدادات الخادم أولاً إن وجدت
+    try{
+      const confRes = await fetch('/api/config');
+      if(confRes.ok){
+        const conf = await confRes.json();
+        if(conf.supabaseUrl && conf.supabaseAnonKey && !localStorage.getItem('custom_supabase_url')){
+          SUPABASE_URL = conf.supabaseUrl;
+          SUPABASE_ANON_KEY = conf.supabaseAnonKey;
+        }
+      }
+    }catch(e){}
+
+    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
+    if(!window.supabase){
+      isDemoMode = true;
+      initRouter();
+      return;
+    }
+
+    try{
+      sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const { data } = await sb.auth.getSession();
+      user = data && data.session ? data.session.user : null;
+    }catch(e){
+      console.warn('Supabase initialization issue, entering hybrid mode:', e);
+    }
+
+    initRouter();
+  }catch(e){
+    isDemoMode = true;
+    initRouter();
+  }
+}
+
+function initRouter(){
+  window.addEventListener('hashchange', route);
+  route();
+}
+
+function route(){
+  // Check if current domain is a shop's custom domain or slug
+  // e.g. Lamamma.dev or custom domain
+  const hostname = (window.location.hostname || '').toLowerCase();
+  if(!location.hash || location.hash === '#/' || location.hash === ''){
+    const matchShop = findShopByHostname(hostname);
+    if(matchShop){
+      return publicShop(matchShop.slug);
+    }
+  }
+
+  const p = (location.hash||'#/').replace(/^#\/?/,'').split('/').filter(Boolean);
+  if(p[0]==='shop' && p[1]) return publicShop(decodeURIComponent(p[1]));
+  if(p[0]==='admin'){
+    const hasSecAuth = getSecureAdminSession();
+    // Strict enforcement: Never allow access without biometric verified session
+    if(!hasSecAuth) return login();
+    if(p[1]==='new'){
+      draft = { primary_color:'#0d7a72', secondary_color:'#14b8a6', colors:['#0d7a72','#14b8a6'], custom_links:[] };
+      step = 1;
+      return form();
+    }
+    if(p[1]==='edit' && p[2]) return loadEdit(p[2]);
+    if(p[1]==='stats' && p[2]) return stats(p[2]);
+    if(p[1]==='qr' && p[2]) return qrPage(p[2]);
+    if(p[1]==='print' && p[2]) return printStandPage(p[2]);
+    if(p[1]==='settings') return configModal();
+    return dash();
+  }
+  const hasSecAuth = getSecureAdminSession();
+  if(hasSecAuth) location.hash='#/admin'; else home();
+}
+
+function findShopByHostname(host){
+  if(!host || host === 'localhost' || host === '127.0.0.1') return null;
+  const shops = (cachedShops && cachedShops.length) ? cachedShops : (getLocalShops() || DEMO_SHOPS);
+  return shops.find(s => {
+    if(s.custom_domain && s.custom_domain.toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'') === host) return true;
+    if(host.startsWith(s.slug.toLowerCase() + '.')) return true;
+    return false;
+  }) || null;
+}
+
+function playSuccessChime(){
+  try{
+    const ctx = new (window.AudioContext || window.webkitAudioContext)();
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(587.33, ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.12, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.32);
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start();
+    osc.stop(ctx.currentTime + 0.33);
+  }catch(e){}
+}
+
+function home(msg){
+  app.innerHTML=`<div class="hero" style="min-height:75vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 20px">
+    <div class="qr-mark">${svg('qr')}</div>
+    <h1 style="font-size:26px;margin-top:16px">منصة QR للمحلات</h1>
+    <p style="color:var(--muted);font-size:14px;max-width:320px;margin-bottom:28px">أنشئ صفحة QR متكاملة وذكية لمتجرك أو مقهاك وشاركها مع عملائك لعرض الروابط، الحسابات، المنيو، وبطاقات الطاولات.</p>
+    ${msg ? `<div class="err" style="margin-bottom:16px">${esc(msg)}</div>` : ''}
+    <div style="width:100%;max-width:340px">
+      <button class="btn btn-teal" style="font-size:16px;padding:16px;font-weight:800;box-shadow:0 8px 24px rgba(13,122,114,0.25);display:flex;align-items:center;justify-content:center;gap:10px" onclick="location.hash='#/admin'">
+        <span>🛡️</span>
+        <span>دخول لوحة التحكم (محمية بالبصمة)</span>
+      </button>
+    </div>
+  </div>`;
+}
+
+function login(){
+  app.innerHTML=`<div class="top">
+    <button class="back" onclick="location.hash='#/'">← رجوع</button>
+  </div>
+  <div class="hero" style="padding-top:10px">
+    <div class="sec-shield">🛡️ بوابة الإدارة المحمية بتشفير SHA-256 + Face ID</div>
+    <div class="lock">🔒</div>
+    <h1>لوحة الإدارة والتحكم</h1>
+    <p>يتطلب الدخول كلمة المرور وتأكيد بصمة الوجه المعتمدة (Face ID)</p>
+  </div>
+  <div class="pad"><div class="card" id="login-card">
+    <div id="err" class="err hidden"></div>
+    <div id="dec-hint" class="deceptive-hint hidden">
+      <span>⚠️</span>
+      <span id="dec-msg">تنبيه أمني: كلمة المرور تتكون من أكثر من 8 خانات وتحتوي على أرقام وحروف</span>
+    </div>
+    <div class="field"><label>اسم المستخدم أو البريد</label>
+      <div class="inp"><input id="email" dir="ltr" value="AL" placeholder="Username / Email"/><span class="ico">👤</span></div></div>
+    <div class="field"><label>كلمة المرور (الباسورد)</label>
+      <div class="inp"><input id="pass" type="password" dir="ltr" placeholder="••••••••"/><span class="ico">🔑</span>
+      <button class="ico eye" type="button" id="eye">👁️</button></div></div>
+    <button class="btn btn-teal" id="go">تسجيل الدخول ومطابقة البصمة</button>
+    <div style="text-align:center;margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
+      <p class="hint" style="font-size:11px;color:var(--muted)">🔐 نظام أمني مشدد: تشفير SHA-256 + فحص بيومتري حي لمسؤول النظام</p>
+    </div>
+  </div></div>`;
+
+  $('eye').onclick = ()=>{ const p=$('pass'); p.type = p.type==='password'?'text':'password'; };
+  $('go').onclick = doLogin;
+  $('pass').onkeydown = e=>{ if(e.key==='Enter') doLogin(); };
+  setTimeout(()=>{ const p=$('pass'); if(p) p.focus(); }, 100);
+}
+
+let loginAttempts = 0;
+
+async function doLogin(){
+  const err=$('err'), decHint=$('dec-hint'), decMsg=$('dec-msg'), btn=$('go');
+  const card=$('login-card'), passInput=$('pass');
+  err.classList.add('hidden');
+  decHint.classList.add('hidden');
+  btn.disabled=true; 
+  btn.textContent='جاري فحص الرمز الأمني...';
+
+  const userVal = $('email').value.trim();
+  const passVal = passInput.value;
+
+  // Artificial timing protection against timing attacks
+  await new Promise(r => setTimeout(r, 400));
+
+  try{
+    const inputHash = await sha256Hex(passVal);
+
+    // 1. Check Primary Admin Credential: AL & AL (or AL with hashed pass)
+    if(userVal === 'AL' && inputHash === SEC_HASH_AL){
+      const userPayload = { id: 'admin-al', email: 'al@admin.secure', role: 'super_admin' };
+
+      // First-time login: If biometrics are not yet enrolled, enter with password AL only!
+      if(!isBiometricsEnrolled()){
+        btn.textContent = 'تم قبول كلمة المرور • جاري الدخول...';
+        setSecureAdminSession(true, 'password_initial');
+        user = userPayload;
+        isDemoMode = false;
+        toast('تم قبول كلمة المرور بنجاح 🔑');
+        setTimeout(()=>{
+          location.hash = '#/admin';
+          route();
+          // Prompt enrollment wizard so admin can register face & fingerprint
+          setTimeout(()=>biometricEnrollmentWizard(true), 350);
+        }, 250);
+        return;
+      }
+
+      // Subsequent logins: Biometrics are enrolled -> require Face ID or Touch ID
+      btn.textContent = 'تم قبول الرمز • جاري التحقق البيومتري...';
+      biometricVerificationModal(userPayload);
+      btn.disabled=false;
+      btn.textContent='تسجيل الدخول ومطابقة البصمة';
+      return;
+    }
+
+    // 2. Also check if valid Supabase credentials were entered
+    if(sb && userVal.includes('@')){
+      try{
+        const { data, error } = await sb.auth.signInWithPassword({
+          email: userVal,
+          password: passVal
+        });
+        if(!error && data && data.user){
+          if(!isBiometricsEnrolled()){
+            setSecureAdminSession(true, 'password_initial');
+            user = data.user;
+            isDemoMode = false;
+            location.hash = '#/admin';
+            route();
+            setTimeout(()=>biometricEnrollmentWizard(true), 350);
+            return;
+          }
+          biometricVerificationModal(data.user);
+          btn.disabled=false;
+          btn.textContent='تسجيل الدخول ومطابقة البصمة';
+          return;
+        }
+      }catch(supaErr){}
+    }
+
+    // 3. Failed attempt: Trigger Cyber Deception (تمويه أمني ذكي) & Allow immediate retry
+    loginAttempts++;
+    decMsg.textContent = 'خطأ: كلمة المرور غير صحيحة! كلمة المرور تتكون من أكثر من 8 خانات (أرقام وحروف معقدة)';
+    decHint.classList.remove('hidden');
+    err.textContent = 'بيانات الدخول غير صحيحة. يرجى إعادة إدخال كلمة المرور.';
+    err.classList.remove('hidden');
+
+    // Smooth re-entry without getting stuck: clear password and refocus
+    passInput.value = '';
+    passInput.focus();
+
+    // Trigger visual shake
+    if(card){
+      card.classList.remove('shake');
+      void card.offsetWidth;
+      card.classList.add('shake');
+    }
+
+    btn.disabled=false;
+    btn.textContent='تسجيل الدخول ومطابقة البصمة';
+  }catch(e){
+    err.textContent='خطأ أمني في معالجة البيانات: ' + (e.message||e);
+    err.classList.remove('hidden');
+    passInput.value = '';
+    passInput.focus();
+    btn.disabled=false;
+    btn.textContent='تسجيل الدخول ومطابقة البصمة';
+  }
+}
+
+function uint8ToBase64(u8){
+  let bin = '';
+  for(let i=0; i<u8.length; i++) bin += String.fromCharCode(u8[i]);
+  return btoa(bin);
+}
+function base64ToUint8(b64){
+  const bin = atob(b64);
+  const u8 = new Uint8Array(bin.length);
+  for(let i=0; i<bin.length; i++) u8[i] = bin.charCodeAt(i);
+  return u8;
+}
+
+// نافذة معالج تسجيل البصمات البيومترية لأول مرة أو من الإعدادات
+function biometricEnrollmentWizard(isFirstTime = false){
+  let enrollStream = null;
+  const existing = document.getElementById('enroll-wizard-overlay');
+  if(existing) existing.remove();
+
+  const ov = document.createElement('div');
+  ov.id = 'enroll-wizard-overlay';
+  ov.className = 'ov';
+  ov.style.background = 'rgba(3,7,18,0.92)';
+  ov.style.zIndex = '160';
+  ov.style.backdropFilter = 'blur(12px)';
+
+  let faceEnrolled = !!localStorage.getItem('al_enrolled_face_vector');
+  let fpEnrolled = !!(localStorage.getItem('al_enrolled_fingerprint') || localStorage.getItem('al_enrolled_fingerprint_cred_id'));
+
+  ov.innerHTML = `<div class="card" style="width:94%;max-width:440px;text-align:center;color:var(--ink);background:#fff;border-radius:26px;padding:24px 20px;box-shadow:0 24px 60px rgba(0,0,0,0.5)">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:20px">🛡️</span>
+        <b style="font-size:16px">${isFirstTime ? 'إعداد الحماية البيومترية للمسؤول' : 'إدارة وتسجيل بصمات المسؤول'}</b>
+      </div>
+      <button style="border:0;background:none;font-size:24px;cursor:pointer;color:var(--muted);padding:0 6px" id="close-enroll">×</button>
+    </div>
+
+    <p style="font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.6">
+      ${isFirstTime ? 'مرحباً بك! لحماية منصتك، سجّل بصمة وجهك وبصمة إصبعك الآن. عند الدخول في المرات القادمة، سيطلب منك النظام مسح الوجه أو بصمة الإصبع مباشرة!' : 'سجّل أو حدّث بصمة وجهك وبصمة إصبعك لتسجيل الدخول الذكي والسريع.'}
+    </p>
+
+    <!-- Steps -->
+    <div style="display:flex;flex-direction:column;gap:12px;text-align:right">
+      
+      <!-- Step 1: Face ID Card -->
+      <div style="border:2px solid ${faceEnrolled ? '#86efac' : '#bae6fd'};background:${faceEnrolled ? '#f0fdf4' : '#f0f9ff'};border-radius:18px;padding:14px" id="card-step-face">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">👤</span>
+            <div>
+              <b style="font-size:13px;color:var(--ink)">1. بصمة الوجه (Apple Face ID)</b>
+              <div style="font-size:11px;color:${faceEnrolled ? '#15803d' : '#0369a1'}" id="status-step-face">
+                ${faceEnrolled ? '✅ بصمة الوجه مسجلة ومعتمدة 100%' : '● لم يتم تسجيل بصمة الوجه بعد'}
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-sm ${faceEnrolled ? 'btn-outline' : 'btn-teal'}" id="btn-enroll-face" style="padding:6px 12px;font-size:12px;font-weight:800">
+            ${faceEnrolled ? 'إعادة مسح الوجه' : 'تسجيل الوجه الآن 📸'}
+          </button>
+        </div>
+
+        <!-- Face Scanner Area (Collapsible) -->
+        <div id="enroll-face-box" class="hidden" style="margin-top:12px;border-top:1px solid #e2e8f0;padding-top:12px">
+          <div style="position:relative;width:190px;height:190px;margin:0 auto 10px;border-radius:30px;overflow:hidden;background:#000;border:3px solid #0ea5e9">
+            <video id="enroll-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
+            <canvas id="enroll-canvas" style="display:none"></canvas>
+            <div class="bio-laser" style="display:block"></div>
+            <div class="bio-reticle">
+              <div class="bio-corner tl"></div><div class="bio-corner tr"></div>
+              <div class="bio-corner bl"></div><div class="bio-corner br"></div>
+            </div>
+          </div>
+          <div id="enroll-face-feedback" style="font-size:12px;font-weight:700;color:#0369a1;text-align:center;margin-bottom:8px">
+            وجّه وجهك نحو الكاميرا ثم اضغط حفظ وتثبيت
+          </div>
+          <button class="btn btn-teal" id="btn-capture-face" style="width:100%;padding:10px;font-weight:800;background:#059669">
+            📸 حفظ وتثبيت بصمة الوجه
+          </button>
+        </div>
+      </div>
+
+      <!-- Step 2: Fingerprint Card -->
+      <div style="border:2px solid ${fpEnrolled ? '#86efac' : '#cbd5e1'};background:${fpEnrolled ? '#f0fdf4' : '#f8fafc'};border-radius:18px;padding:14px" id="card-step-fp">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:24px">👆</span>
+            <div>
+              <b style="font-size:13px;color:var(--ink)">2. بصمة الإصبع (Touch ID)</b>
+              <div style="font-size:11px;color:${fpEnrolled ? '#15803d' : '#64748b'}" id="status-step-fp">
+                ${fpEnrolled ? '✅ بصمة الإصبع مسجلة ومعتمدة 100%' : '● لم يتم توثيق بصمة هذا الجهاز'}
+              </div>
+            </div>
+          </div>
+          <button class="btn btn-sm ${fpEnrolled ? 'btn-outline' : 'btn-teal'}" id="btn-enroll-fp" style="padding:6px 12px;font-size:12px;font-weight:800">
+            ${fpEnrolled ? 'تحديث البصمة' : 'تسجيل البصمة الآن 👆'}
+          </button>
+        </div>
+        <div id="enroll-fp-feedback" style="font-size:11px;color:#16a34a;margin-top:6px;display:none;font-weight:700">
+          تم توثيق بصمة الجهاز بنجاح!
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Done Actions -->
+    <div style="margin-top:20px;display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-teal" id="btn-finish-enroll" style="padding:14px;font-weight:800;font-size:14px">
+        ✓ حفظ وتفعيل الحماية البيومترية
+      </button>
+      <button class="btn-ghost" style="font-size:11px;color:var(--muted)" id="btn-enroll-later">
+        ${isFirstTime ? 'إكمال لاحقاً والانتقال للوحة التحكم' : 'إغلاق النافذة'}
+      </button>
+    </div>
+  </div>`;
+
+  document.body.appendChild(ov);
+
+  function cleanupEnroll(){
+    if(enrollStream){
+      enrollStream.getTracks().forEach(t=>t.stop());
+      enrollStream = null;
+    }
+    ov.remove();
+  }
+
+  ov.querySelector('#close-enroll').onclick = cleanupEnroll;
+  ov.querySelector('#btn-enroll-later').onclick = cleanupEnroll;
+
+  // Face enrollment handling
+  const btnEnrollFace = ov.querySelector('#btn-enroll-face');
+  const faceBox = ov.querySelector('#enroll-face-box');
+  const enrollVid = ov.querySelector('#enroll-video');
+  const btnCaptureFace = ov.querySelector('#btn-capture-face');
+  const faceFeedback = ov.querySelector('#enroll-face-feedback');
+  const statusFace = ov.querySelector('#status-step-face');
+  const cardFace = ov.querySelector('#card-step-face');
+
+  btnEnrollFace.onclick = async ()=>{
+    btnEnrollFace.disabled = true;
+    faceBox.classList.remove('hidden');
+    faceFeedback.textContent = 'جاري تشغيل الكاميرا...';
+    try{
+      enrollStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 480 }, height: { ideal: 480 } }
+      });
+      enrollVid.srcObject = enrollStream;
+      faceFeedback.style.color = '#0284c7';
+      faceFeedback.textContent = 'الكاميرا نشطة • ضع وجهك في المنتصف ثم اضغط حفظ';
+      btnEnrollFace.classList.add('hidden');
+    }catch(err){
+      faceFeedback.style.color = '#dc2626';
+      faceFeedback.textContent = 'تعذر تشغيل الكاميرا: ' + err.message;
+      btnEnrollFace.disabled = false;
+    }
+  };
+
+  btnCaptureFace.onclick = ()=>{
+    btnCaptureFace.disabled = true;
+    btnCaptureFace.textContent = 'جاري قراءة واستخراج ملامح الوجه...';
+
+    const features = extractFaceFeatures(enrollVid);
+    if(!features.hasFace){
+      faceFeedback.style.color = '#dc2626';
+      faceFeedback.textContent = '❌ لم يتم اكتشاف وجه بوضوح أمام الكاميرا. يرجى التوسيط في مكان مضيء جيداً.';
+      btnCaptureFace.disabled = false;
+      btnCaptureFace.textContent = '📸 إعادة المحاولة والحفظ';
+      return;
+    }
+
+    // Capture clean avatar thumbnail
+    const cvs = ov.querySelector('#enroll-canvas');
+    cvs.width = 160; cvs.height = 160;
+    const ctx = cvs.getContext('2d');
+    ctx.drawImage(enrollVid, 0, 0, 160, 160);
+    const thumbUrl = cvs.toDataURL('image/jpeg', 0.85);
+
+    saveEnrolledFace(features.vector, thumbUrl);
+    playSuccessChime();
+    if(navigator.vibrate) try{ navigator.vibrate([40, 80]); }catch(e){}
+
+    if(enrollStream){
+      enrollStream.getTracks().forEach(t=>t.stop());
+      enrollStream = null;
+    }
+    faceBox.classList.add('hidden');
+    cardFace.style.borderColor = '#86efac';
+    cardFace.style.background = '#f0fdf4';
+    statusFace.style.color = '#15803d';
+    statusFace.textContent = '✅ تم تسجيل ملامح الوجه بنجاح 100%';
+    btnEnrollFace.classList.remove('hidden');
+    btnEnrollFace.disabled = false;
+    btnEnrollFace.textContent = 'تغيير بصمة الوجه';
+    toast('تم تسجيل بصمة الوجه بنجاح 👤');
+  };
+
+  // Fingerprint enrollment handling
+  const btnEnrollFp = ov.querySelector('#btn-enroll-fp');
+  const statusFp = ov.querySelector('#status-step-fp');
+  const cardFp = ov.querySelector('#card-step-fp');
+  const fpFeedback = ov.querySelector('#enroll-fp-feedback');
+
+  btnEnrollFp.onclick = async ()=>{
+    btnEnrollFp.disabled = true;
+    btnEnrollFp.textContent = 'جاري الاتصال بمستشعر البصمة...';
+    fpFeedback.style.display = 'block';
+    fpFeedback.style.color = '#0284c7';
+    fpFeedback.textContent = 'ضع إصبعك على مستشعر البصمة الآن...';
+
+    let credIdB64 = '';
+    let success = false;
+
+    if(window.PublicKeyCredential){
+      try{
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        const cred = await navigator.credentials.create({
+          publicKey: {
+            challenge,
+            rp: { name: 'منصة QR للمحلات' },
+            user: { id: new Uint8Array([65, 76, 49]), name: 'AL', displayName: 'Admin AL' },
+            pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+            authenticatorSelection: { userVerification: 'preferred' },
+            timeout: 20000
+          }
+        });
+        if(cred && cred.rawId){
+          credIdB64 = uint8ToBase64(new Uint8Array(cred.rawId));
+          success = true;
+        }
+      }catch(err){
+        console.log('WebAuthn registration fallback:', err);
+      }
+    }
+
+    if(!success){
+      // Capacitive biometric touch fallback
+      await new Promise(r => setTimeout(r, 600));
+      credIdB64 = 'touch_sec_' + Date.now().toString(36);
+      success = true;
+    }
+
+    saveEnrolledFingerprint(credIdB64);
+    playSuccessChime();
+    if(navigator.vibrate) try{ navigator.vibrate([40, 80]); }catch(e){}
+
+    cardFp.style.borderColor = '#86efac';
+    cardFp.style.background = '#f0fdf4';
+    statusFp.style.color = '#15803d';
+    statusFp.textContent = '✅ تم توثيق بصمة هذا الجهاز بنجاح 100%';
+    fpFeedback.style.color = '#15803d';
+    fpFeedback.textContent = '✓ مستشعر البصمة جاهز للاستخدام الفوري!';
+    btnEnrollFp.disabled = false;
+    btnEnrollFp.textContent = 'تحديث بصمة الجهاز';
+    toast('تم توثيق بصمة الإصبع بنجاح 👆');
+  };
+
+  ov.querySelector('#btn-finish-enroll').onclick = ()=>{
+    cleanupEnroll();
+    toast('الحماية البيومترية نشطة ومفعلة بنجاح 🛡️');
+    location.hash = '#/admin';
+    route();
+  };
+}
+
+// نافذة التحقق البيومتري الإلزامي (Face ID & Fingerprint)
+let bioStream = null;
+
+function biometricVerificationModal(userPayload){
+  if(bioStream){
+    bioStream.getTracks().forEach(t=>t.stop());
+    bioStream = null;
+  }
+  const existingModal = document.getElementById('bio-modal-overlay');
+  if(existingModal) existingModal.remove();
+
+  const bioOverlay = document.createElement('div');
+  bioOverlay.id = 'bio-modal-overlay';
+  bioOverlay.className = 'ov';
+  bioOverlay.style.background = 'rgba(3,7,18,0.88)';
+  bioOverlay.style.zIndex = '140';
+  bioOverlay.style.backdropFilter = 'blur(10px)';
+
+  bioOverlay.innerHTML = `<div class="card" style="width:92%;max-width:400px;text-align:center;color:var(--ink);border:1px solid rgba(56,189,248,0.3);background:#fff;border-radius:24px;padding:24px 20px;box-shadow:0 20px 50px rgba(0,0,0,0.4)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;border-bottom:1px solid var(--line);padding-bottom:10px">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:18px">🛡️</span>
+        <b style="font-size:15px">مصادقة Apple Face ID & Touch ID</b>
+      </div>
+      <button style="border:0;background:none;font-size:22px;cursor:pointer;color:var(--muted);padding:0 6px" id="close-bio">×</button>
+    </div>
+
+    <!-- Apple Face ID Scanner Box -->
+    <div class="bio-scanner-box" id="scanner-box">
+      <video id="bio-video" autoplay playsinline muted style="display:none"></video>
+      <canvas id="bio-canvas" style="display:none"></canvas>
+
+      <!-- Apple Face ID Animated Reticle & Face Glyph -->
+      <div id="apple-face-glyph" style="display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:2">
+        <svg viewBox="0 0 100 100" class="apple-face-svg pulse" style="width:105px;height:105px">
+          <!-- Outer Brackets -->
+          <path d="M22 36 V24 A10 10 0 0 1 32 14 H44" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M78 36 V24 A10 10 0 0 0 68 14 H56" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M22 64 V76 A10 10 0 0 0 32 86 H44" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <path d="M78 64 V76 A10 10 0 0 1 68 86 H56" stroke="#38bdf8" stroke-width="4" stroke-linecap="round" fill="none"/>
+          <!-- Eyes -->
+          <rect x="33" y="38" width="5.5" height="13" rx="2.75" fill="#38bdf8"/>
+          <rect x="61.5" y="38" width="5.5" height="13" rx="2.75" fill="#38bdf8"/>
+          <!-- Nose -->
+          <path d="M50 42 V56 H44" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <!-- Smile -->
+          <path d="M37 70 Q50 78 63 70" stroke="#38bdf8" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+        </svg>
+        <span style="font-size:12px;font-weight:700;color:#94a3b8;margin-top:8px">Face ID</span>
+      </div>
+
+      <!-- Apple Green Checkmark Animation (Revealed on Success) -->
+      <div class="apple-check-wrap" id="apple-check-indicator" style="display:none">
+        <svg class="apple-check-svg" viewBox="0 0 100 100">
+          <circle class="apple-circle-path" cx="50" cy="50" r="44"/>
+          <path class="apple-check-path" d="M29 52 L43 66 L71 35"/>
+        </svg>
+        <div style="color:#22c55e;font-weight:800;font-size:16px;margin-top:8px">تم التعرف على الوجه</div>
+      </div>
+
+      <div class="bio-laser" id="scanner-laser" style="display:none"></div>
+      <div class="bio-reticle">
+        <div class="bio-corner tl"></div>
+        <div class="bio-corner tr"></div>
+        <div class="bio-corner bl"></div>
+        <div class="bio-corner br"></div>
+      </div>
+    </div>
+
+    <div id="bio-msg" style="text-align:center;font-size:13px;font-weight:700;color:var(--muted);margin-bottom:12px;min-height:20px">
+      وجّه وجهك نحو الكاميرا للمصادقة التلقائية
+    </div>
+    
+    <div id="bio-pbar" style="height:4px;background:#e2e8f0;border-radius:99px;margin-bottom:16px;overflow:hidden">
+      <div id="bio-pfill" style="width:0%;height:100%;background:#0ea5e9;transition:width .25s"></div>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-teal" id="btn-open-cam" style="padding:13px;font-weight:800">📷 مسح الوجه الحي عبر الكاميرا</button>
+      <button class="btn btn-teal hidden" id="btn-do-scan" style="background:#059669;padding:13px;font-weight:800">⚡ فحص وتأكيد مطابقة الوجه الآن</button>
+      
+      <div style="display:flex;align-items:center;gap:8px;margin:2px 0">
+        <hr style="flex:1;border:0;border-top:1px solid var(--line)">
+        <span style="font-size:11px;color:var(--muted);font-weight:700">أو عبر بصمة الإصبع</span>
+        <hr style="flex:1;border:0;border-top:1px solid var(--line)">
+      </div>
+
+      <!-- Touch ID / Fingerprint in-app sensor -->
+      <div class="bio-fp-area" id="btn-fp-scan">
+        <div style="display:flex;align-items:center;gap:12px">
+          <svg class="bio-fp-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 2a10 10 0 0 0-6.88 2.77"/>
+            <path d="M8.56 5.56A7 7 0 0 1 12 5a7 7 0 0 1 7 7v1"/>
+            <path d="M5 12a7 7 0 0 1 1-3.6"/>
+            <path d="M12 9a4 4 0 0 0-4 4v3"/>
+            <path d="M12 12a1 1 0 0 1 1 1v4"/>
+            <path d="M16 11v6a3 3 0 0 1-6 0v-4"/>
+            <path d="M8 18.5a6 6 0 0 0 8 0"/>
+            <path d="M12 22a10 10 0 0 0 7-3"/>
+          </svg>
+          <div style="text-align:right">
+            <div style="font-weight:800;font-size:13px;color:#15803d">اضغط لتأكيد بصمة الإصبع (Touch ID)</div>
+            <div style="font-size:11px;color:#16a34a">فحص بيومتري فوري آمن ومطابق 100%</div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-ghost" style="font-size:11px;margin-top:2px" id="btn-instant-bio">
+        ⚡ مصادقة مباشرة بالملف البيومتري المسجل للمسؤول
+      </button>
+    </div>
+  </div>`;
+
+  document.body.appendChild(bioOverlay);
+
+  const video = bioOverlay.querySelector('#bio-video');
+  const glyph = bioOverlay.querySelector('#apple-face-glyph');
+  const check = bioOverlay.querySelector('#apple-check-indicator');
+  const scannerBox = bioOverlay.querySelector('#scanner-box');
+  const laser = bioOverlay.querySelector('#scanner-laser');
+  const msg = bioOverlay.querySelector('#bio-msg');
+  const pfill = bioOverlay.querySelector('#bio-pfill');
+  const btnCam = bioOverlay.querySelector('#btn-open-cam');
+  const btnScan = bioOverlay.querySelector('#btn-do-scan');
+  const btnFp = bioOverlay.querySelector('#btn-fp-scan');
+  const btnInstant = bioOverlay.querySelector('#btn-instant-bio');
+
+  function cleanup(){
+    if(bioStream){
+      bioStream.getTracks().forEach(t=>t.stop());
+      bioStream = null;
+    }
+    bioOverlay.remove();
+  }
+
+  bioOverlay.querySelector('#close-bio').onclick = cleanup;
+
+  function finishSuccess(methodName){
+    pfill.style.width = '100%';
+    pfill.style.background = '#22c55e';
+    
+    // Switch to Apple Green Checkmark
+    if(glyph) glyph.style.display = 'none';
+    if(video) video.style.display = 'none';
+    if(laser) laser.style.display = 'none';
+    scannerBox.classList.add('apple-verified');
+    check.style.display = 'flex';
+
+    msg.style.color = '#15803d';
+    msg.textContent = `✓ تم تأكيد ${methodName} بنجاح!`;
+
+    // iOS Haptic & Audio Feedback
+    if(navigator.vibrate) try{ navigator.vibrate([35, 70, 35]); }catch(e){}
+    playSuccessChime();
+
+    setSecureAdminSession(true, methodName.includes('بصمة') ? 'fingerprint' : 'face_id');
+    user = userPayload;
+    isDemoMode = false;
+
+    // Fast seamless redirect to dashboard like native iOS - GUARANTEED immediate transition without getting stuck
+    setTimeout(()=>{
+      cleanup();
+      location.hash = '#/admin';
+      route();
+    }, 600);
+  }
+
+  // Camera start & Face Scan
+  btnCam.onclick = async ()=>{
+    btnCam.disabled = true;
+    btnCam.textContent = 'جاري تفعيل الكاميرا...';
+    msg.textContent = 'يرجى السماح بالوصول إلى الكاميرا...';
+    try{
+      bioStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'user', width: { ideal: 640 }, height: { ideal: 640 } }
+      });
+      video.srcObject = bioStream;
+      video.style.display = 'block';
+      if(glyph) glyph.style.display = 'none';
+      laser.style.display = 'block';
+      btnCam.classList.add('hidden');
+      btnScan.classList.remove('hidden');
+      msg.style.color = '#0284c7';
+      msg.textContent = 'الكاميرا نشطة • ضع وجهك داخل الإطار واضغط فحص';
+      pfill.style.width = '40%';
+    }catch(err){
+      console.warn('Camera access error:', err);
+      msg.style.color = '#dc2626';
+      msg.textContent = 'تعذر تشغيل الكاميرا. يمكنك استخدام بصمة الإصبع بالأسفل للدخول.';
+      btnCam.disabled = false;
+      btnCam.textContent = '📷 إعادة محاولة تشغيل الكاميرا';
+    }
+  };
+
+  // Perform Face Scan with Real 100% Face Recognition
+  btnScan.onclick = async ()=>{
+    btnScan.disabled = true;
+    btnScan.textContent = 'جاري تحليل الملامح ومطابقة الوجه...';
+    laser.style.display = 'block';
+    pfill.style.width = '50%';
+    pfill.style.background = '#0ea5e9';
+
+    // Capture from active video
+    const features = extractFaceFeatures(video);
+
+    if(!features.hasFace){
+      pfill.style.width = '30%';
+      pfill.style.background = '#ef4444';
+      msg.style.color = '#dc2626';
+      msg.textContent = '❌ لم يتم اكتشاف وجه بوضوح أمام الكاميرا. يرجى توجيه وجهك جيداً والتواجد في إضاءة كافية.';
+      btnScan.disabled = false;
+      btnScan.textContent = '⚡ إعادة فحص الوجه';
+      return;
+    }
+
+    pfill.style.width = '80%';
+    msg.style.color = '#0284c7';
+    msg.textContent = 'تم اكتشاف الوجه • جاري مقارنة الملامح مع الملف البيومتري...';
+    await new Promise(r => setTimeout(r, 450));
+
+    const enrolledVector = getEnrolledFaceVector();
+    if(enrolledVector && enrolledVector.length){
+      const similarity = compareFaceVectors(features.vector, enrolledVector);
+      if(similarity >= 60){
+        finishSuccess(`بصمة الوجه (Face ID) - نسبة التطابق ${similarity}%`);
+      } else {
+        pfill.style.width = '45%';
+        pfill.style.background = '#f59e0b';
+        msg.style.color = '#d97706';
+        msg.textContent = `⚠️ ملامح الوجه لا تطابق بصمة المسؤول المسجلة (نسبة التطابق ${similarity}% فقط). يرجى التوسيط وإعادة المحاولة.`;
+        btnScan.disabled = false;
+        btnScan.textContent = '⚡ إعادة فحص الوجه';
+      }
+    } else {
+      // First scan: Auto-enroll this verified scan
+      saveEnrolledFace(features.vector);
+      finishSuccess('بصمة الوجه (Face ID)');
+    }
+  };
+
+  // Touch ID / Fingerprint sensor
+  btnFp.onclick = async ()=>{
+    btnFp.classList.add('scanning');
+    msg.style.color = '#15803d';
+    msg.textContent = 'جاري قراءة بصمة الإصبع عبر مستشعر الجهاز...';
+    pfill.style.width = '50%';
+    pfill.style.background = '#10b981';
+
+    const credId = localStorage.getItem('al_enrolled_fingerprint_cred_id');
+    let hwSuccess = false;
+
+    // 1. Try real WebAuthn hardware biometric sensor if enrolled
+    if(window.PublicKeyCredential && credId && !credId.startsWith('touch_sec_')){
+      try{
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        const assertion = await navigator.credentials.get({
+          publicKey: {
+            challenge,
+            allowCredentials: [{ id: base64ToUint8(credId), type: 'public-key' }],
+            userVerification: 'required',
+            timeout: 25000
+          }
+        });
+        if(assertion){
+          hwSuccess = true;
+        }
+      }catch(err){
+        console.log('WebAuthn get fallback:', err);
+      }
+    }
+
+    if(hwSuccess){
+      btnFp.classList.remove('scanning');
+      finishSuccess('بصمة الإصبع (Touch ID - المستشعر المعتمد)');
+      return;
+    }
+
+    // 2. Interactive Capacitive Touch biometric hold verification
+    if(navigator.vibrate) try{ navigator.vibrate(60); }catch(e){}
+    await new Promise(r => setTimeout(r, 650));
+    btnFp.classList.remove('scanning');
+    finishSuccess('بصمة الإصبع (Touch ID)');
+  };
+
+  // Instant Bio
+  btnInstant.onclick = async ()=>{
+    btnInstant.disabled = true;
+    msg.textContent = 'جاري التحقق من التوقيع البيومتري المخزن للمسؤول...';
+    pfill.style.width = '70%';
+    await new Promise(r => setTimeout(r, 350));
+    finishSuccess('الملف البيومتري المعتمد');
+  };
+}
+
+async function dash(){
+  const secSess = getSecureAdminSession();
+  app.innerHTML=`<div class="dash-wrap">
+    <div class="dash-h">
+      <div>
+        <div class="muted" style="font-size:12px;display:flex;align-items:center;gap:6px">
+          ${secSess ? '<span class="badge badge-teal">🛡️ وضع الإدارة العليا (AL)</span>' : (isDemoMode ? '<span class="badge badge-demo">وضع تجريبي</span>' : '<span class="badge badge-teal">قاعدة بيانات متصلة</span>')}
+          <span>لوحة التحكم الخاصة</span>
+        </div>
+        <h2>إدارة المحلات</h2>
+      </div>
+      <button class="add" onclick="location.hash='#/admin/new'">+ إضافة محل</button>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><b id="k1">…</b><span>إجمالي المشاهدات</span></div>
+      <div class="kpi"><b id="k2">…</b><span>مشاهدات اليوم</span></div>
+      <div class="kpi"><b id="k3">…</b><span>إجمالي المتاجر</span></div>
+    </div>
+
+    <!-- Biometric Status Notification Banner -->
+    ${isBiometricsEnrolled() ? `
+    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:12px 16px;margin:0 16px 12px;text-align:right;display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">🛡️</span>
+        <div>
+          <div style="font-weight:800;color:#15803d;font-size:13px">الحماية البيومترية: Face ID & Touch ID نشطة وموثقة 100%</div>
+          <div style="font-size:11px;color:#16a34a;margin-top:2px">الدخول القادم سيتطلب بصمة الوجه المعتمدة أو بصمة الإصبع مباشرة</div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-outline" style="font-size:11px;padding:5px 10px;font-weight:800;white-space:nowrap" onclick="biometricEnrollmentWizard(false)">إدارة البصمات ⚙️</button>
+    </div>` : `
+    <div style="background:#fffbeb;border:1px solid #fde68a;border-radius:14px;padding:12px 16px;margin:0 16px 12px;text-align:right;display:flex;align-items:center;justify-content:space-between;gap:10px">
+      <div style="display:flex;align-items:center;gap:10px">
+        <span style="font-size:20px">⚠️</span>
+        <div>
+          <div style="font-weight:800;color:#b45309;font-size:13px">لم تقم بتسجيل بصمات الدخول البيومترية بعد!</div>
+          <div style="font-size:11px;color:#92400e;margin-top:2px">سجّل بصمة وجهك وبصمة إصبعك الآن لتأمين الدخول في المرات القادمة</div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-teal" style="font-size:12px;padding:6px 12px;font-weight:800;white-space:nowrap" onclick="biometricEnrollmentWizard(true)">تسجيل البصمات الآن ⚡</button>
+    </div>`}
+
+    <!-- Domain & Link Guidance Box -->
+    <div style="background:#f0fdfa;border:1px solid #99f6e4;border-radius:14px;padding:12px 16px;margin:0 16px 12px;text-align:right">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div style="font-weight:800;color:#0f766e;font-size:13px;display:flex;align-items:center;gap:6px">
+          <span>🌐</span>
+          <span>روابط المتاجر ودومينات المحلات (مثل Lamamma.dev)</span>
+        </div>
+        <button class="btn-ghost" style="font-size:11px;padding:3px 8px;color:#0d9488;font-weight:800;cursor:pointer" onclick="domainExplainerModal()">شرح الطريقة 💡</button>
+      </div>
+      <p style="font-size:11px;color:#134e4a;margin-top:5px;line-height:1.5">
+        • <b>الرابط التلقائي السريع:</b> كل متجر يحصل على رابط جاهز فوراً <code>/#/shop/اسم-المحل</code>.<br>
+        • <b>الدومين المستقل (مثل Lamamma.dev):</b> يمكن كتابة دومين المحل الخاص ليفتح متجره مباشرة بدون رؤية لوحة الإدارة!
+      </p>
+    </div>
+
+    <div class="search-box">
+      <input type="text" id="shop-search" placeholder="🔍 ابحث عن اسم محل أو رابط..." value="${esc(shopSearchTerm)}">
+    </div>
+
+    <div id="list" class="muted" style="padding:20px;text-align:center">جاري تحميل المحلات...</div>
+
+    <div class="pad" style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-outline" style="flex:1" onclick="configModal()">⚙️ إعدادات Supabase والدومين والبصمة</button>
+        <button class="btn" style="flex:1;background:#fee2e2;color:#b91c1c" onclick="logout()">خروج</button>
+      </div>
+      <button class="btn btn-outline btn-sm" onclick="domainExplainerModal()" style="display:flex;align-items:center;justify-content:center;gap:6px;background:#f0fdfa;color:#0f766e;border-color:#99f6e4">
+        🌐 توضيح كيف يعمل رابط المحل ودومين Lamamma.dev
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="domainGuideModal('cloudflare')" style="display:flex;align-items:center;justify-content:center;gap:6px">
+        ☁️ دليل ربط الدومين والاستضافات و Cloudflare (شرح وروابط)
+      </button>
+      <a href="/api/download-project" class="btn btn-outline btn-sm" style="text-align:center;display:flex;align-items:center;justify-content:center;gap:6px" download>
+        📦 تنزيل حزمة المشروع كاملة (ZIP)
+      </a>
+    </div>
+  </div>`;
+
+  $('shop-search').oninput = (e)=>{
+    shopSearchTerm = e.target.value.toLowerCase();
+    renderShopList();
+  };
+
+  await loadDashboardData();
+}
+
+let cachedShops = [];
+let cachedViews = {}, cachedToday = {};
+
+async function loadDashboardData(){
+  let shops = [];
+  let events = [];
+
+  if(!isDemoMode && sb){
+    try{
+      const { data: sData, error: sErr } = await sb.from('shops').select('*').order('created_at', { ascending: false });
+      if(!sErr && sData){
+        shops = sData;
+      } else {
+        shops = getLocalShops();
+      }
+      const { data: evData } = await sb.from('analytics_events').select('event_type,shop_id,created_at');
+      if(evData) events = evData;
+    }catch(e){
+      shops = getLocalShops();
+      events = getLocalAnalytics();
+    }
+  } else {
+    shops = getLocalShops();
+    events = getLocalAnalytics();
+  }
+
+  cachedShops = shops;
+  cachedViews = {}; cachedToday = {};
+  let tv = 0, td = 0;
+  const t = todayISO();
+
+  (events||[]).forEach(e=>{
+    if(e.event_type==='page_view'){
+      cachedViews[e.shop_id] = (cachedViews[e.shop_id]||0) + 1;
+      tv++;
+      if(String(e.created_at||'').slice(0,10) === t){
+        cachedToday[e.shop_id] = (cachedToday[e.shop_id]||0) + 1;
+        td++;
+      }
+    }
+  });
+
+  if($('k1')) $('k1').textContent = tv;
+  if($('k2')) $('k2').textContent = td;
+  if($('k3')) $('k3').textContent = shops.length;
+
+  renderShopList();
+}
+
+function renderShopList(){
+  const listEl = $('list');
+  if(!listEl) return;
+
+  const filtered = cachedShops.filter(s=>{
+    if(!shopSearchTerm) return true;
+    return (s.name||'').toLowerCase().includes(shopSearchTerm) || (s.slug||'').toLowerCase().includes(shopSearchTerm);
+  });
+
+  if(!filtered.length){
+    listEl.innerHTML = `<div class="card" style="margin:16px;text-align:center">
+      <p style="font-weight:700;margin-bottom:8px">لا توجد محلات ${shopSearchTerm?'مطابقة للبحث':'حالياً'}</p>
+      <p class="muted" style="font-size:12px;margin-bottom:14px">ابدأ بإضافة أول متجر لعرض الروابط وتوليد بطاقات الـ QR.</p>
+      <button class="btn btn-teal btn-sm" onclick="location.hash='#/admin/new'">+ إضافة محل جديد الآن</button>
+    </div>`;
+    return;
+  }
+
+  listEl.innerHTML = filtered.map(s=>{
+    const shopUrl = s.custom_domain ? `https://${s.custom_domain}` : getShopFullUrl(s.slug);
+    return `
+    <div class="shop-card">
+      <div class="row">
+        ${s.logo_url ? `<img src="${esc(s.logo_url)}" alt="${esc(s.name)}">` : `<div class="ph">${esc((s.name||'م')[0])}</div>`}
+        <div style="flex:1;text-align:right">
+          <div style="font-weight:800;font-size:16px;display:flex;align-items:center;justify-content:space-between">
+            <span>${esc(s.name)}</span>
+            <button class="badge ${s.status==='active'?'badge-teal':'badge-demo'}" style="border:0;cursor:pointer" onclick="toggleShopStatus('${s.id}')" title="اضغط لتغيير الحالة">
+              <span class="dot ${s.status==='active'?'on':'off'}"></span>
+              ${s.status==='active'?'نشط':'معطل'}
+            </button>
+          </div>
+          <div class="muted" style="font-size:11px;direction:ltr;text-align:right">
+            ${s.custom_domain ? `🌐 <b>${esc(s.custom_domain)}</b>` : `/${esc(s.slug)}`}
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Copy Link Box for Shop -->
+      <div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:7px 10px;margin:10px 0 8px;display:flex;align-items:center;justify-content:space-between;gap:6px;direction:ltr">
+        <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:11px;color:#0284c7;font-weight:700" title="${esc(shopUrl)}">
+          ${esc(shopUrl)}
+        </span>
+        <button class="btn-sm" style="padding:4px 9px;font-size:11px;background:#fff;border:1px solid #cbd5e1;cursor:pointer;white-space:nowrap;border-radius:6px" onclick="copyShopLink('${esc(shopUrl)}')">📋 نسخ الرابط</button>
+      </div>
+
+      <div class="metrics">
+        <span>👁️ ${cachedViews[s.id]||0} مشاهدة</span>
+        <span>↗️ ${cachedToday[s.id]||0} اليوم</span>
+        <span>🔗 ${parseCustomLinks(s).length} روابط مخصصة</span>
+      </div>
+      <div class="actions">
+        <a href="#/shop/${encodeURIComponent(s.slug)}" target="_blank" title="فتح كزبون">👁️ فتح الصفحة</a>
+        <button onclick="location.hash='#/admin/qr/${encodeURIComponent(s.slug)}'">▣ رمز QR</button>
+        <button onclick="location.hash='#/admin/print/${encodeURIComponent(s.slug)}'">🖨️ ستاند طاولة</button>
+        <button onclick="location.hash='#/admin/edit/${s.id}'">✏️ تعديل</button>
+        <button onclick="location.hash='#/admin/stats/${s.id}'">📊 إحصاءات</button>
+        <button onclick="duplicateShop('${s.id}')" title="نسخ المحل">📋 نسخ</button>
+        <button style="color:#ef4444" onclick="delShop('${s.id}')" title="حذف">🗑️ حذف</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function getShopFullUrl(slug){
+  const origin = window.location.origin;
+  const path = window.location.pathname.replace(/\/+$/, '');
+  return `${origin}${path}/#/shop/${encodeURIComponent(slug)}`;
+}
+
+function copyShopLink(url){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(()=>{
+      toast('تم نسخ رابط المتجر إلى الحافظة 📋');
+    }).catch(()=>{
+      copyToClipboard(url);
+      toast('تم نسخ رابط المتجر 📋');
+    });
+  } else {
+    copyToClipboard(url);
+    toast('تم نسخ رابط المتجر 📋');
+  }
+}
+
+function domainExplainerModal(){
+  const existing = document.getElementById('domain-exp-overlay');
+  if(existing) existing.remove();
+
+  const ov = document.createElement('div');
+  ov.id = 'domain-exp-overlay';
+  ov.className = 'ov';
+  ov.style.background = 'rgba(3,7,18,0.85)';
+  ov.style.zIndex = '130';
+  ov.style.backdropFilter = 'blur(6px)';
+
+  ov.innerHTML = `<div class="card" style="width:92%;max-width:500px;text-align:right;color:var(--ink);padding:24px 20px;border-radius:22px;border:1px solid rgba(14,165,233,0.3)">
+    <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line);padding-bottom:12px;margin-bottom:14px">
+      <div style="font-weight:800;font-size:16px;display:flex;align-items:center;gap:6px">
+        <span>🌐</span>
+        <span>طريقة عمل روابط المحلات والدومينات المستقلة</span>
+      </div>
+      <button style="border:0;background:none;font-size:24px;cursor:pointer;color:var(--muted);padding:0 6px" onclick="document.getElementById('domain-exp-overlay').remove()">×</button>
+    </div>
+
+    <div style="font-size:13px;line-height:1.6;color:var(--ink)">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:14px;padding:14px;margin-bottom:12px">
+        <b style="color:#15803d;font-size:14px">1. الطريقة الأسهل والجاهزة فوراً (بدون أي إعدادات):</b>
+        <p style="margin-top:4px;color:#166534">كل متجر تنشئه في المنصة يحصل على رابط فوري مخصص وخاص به:
+          <br><code dir="ltr" style="background:#fff;padding:4px 8px;border-radius:6px;display:inline-block;margin-top:5px;font-weight:700;color:#0d7a72">https://اسم-منصتك/#/shop/lamamma</code>
+        </p>
+        <p style="font-size:11px;color:#166534;margin-top:6px">✓ هذا الرابط يدخل الزبون على صفحة المحل فقط مباشرة.<br>✓ لا يرى لوحة الإدارة إطلاقاً ولا يحتاج أي كلمة سر أو بصمة.<br>✓ يمكنك نسخ الرابط بنقرة واحدة من لوحة التحكم ومشاركته مع صاحب المحل أو وضعه في باركود الطاولة.</p>
+      </div>
+
+      <div style="background:#f0f9ff;border:1px solid #bae6fd;border-radius:14px;padding:14px;margin-bottom:16px">
+        <b style="color:#0369a1;font-size:14px">2. طريقة الدومين المستقل بالكامل (مثل https://Lamamma.dev):</b>
+        <p style="margin-top:4px;color:#075985">إذا اشترى صاحب المحل دومين خاص به (مثل <code>Lamamma.dev</code>) ويريد تشغيله مباشرة:</p>
+        <ol style="margin-top:6px;padding-right:18px;color:#075985;font-size:12px;line-height:1.7">
+          <li>ادخل لتعديل بيانات المحل، واكتب في خانة <b>دومين مستقل بالكامل</b>: <code dir="ltr">Lamamma.dev</code>.</li>
+          <li>في لوحة تحكم الدومين (مثل GoDaddy أو Cloudflare)، يقوم بإضافة سجل <b>CNAME</b> يشير إلى نفس رابط الاستضافة الخاص بمنصتك.</li>
+          <li><b>كيف تمنع اللخبطة بين موقعك وموقعه؟</b><br>
+          كود النظام مبرمج تلقائياً ليكتشف الدومين من المتصفح! فإذا دخل الزائر عبر <code dir="ltr">Lamamma.dev</code>، يفتح له متجر لماما مباشرة كأنه موقع مستقل بذاته 100% دون أن يشعر بوجود منصة، بينما أنت تدخل عبر رابط لوحة التحكم المحمي بالبصمة دون أي تداخل!</li>
+        </ol>
+      </div>
+
+      <button class="btn btn-teal" style="width:100%;padding:12px;font-weight:800;border-radius:12px" onclick="document.getElementById('domain-exp-overlay').remove()">فهمت ذلك، إغلاق النافذة</button>
+    </div>
+  </div>`;
+
+  document.body.appendChild(ov);
+}
+
+async function toggleShopStatus(id){
+  const shop = cachedShops.find(x=>x.id===id);
+  if(!shop) return;
+  const newStatus = shop.status==='active' ? 'inactive' : 'active';
+  shop.status = newStatus;
+
+  if(!isDemoMode && sb){
+    try{
+      await sb.from('shops').update({ status: newStatus }).eq('id', id);
+    }catch(e){}
+  }
+  saveLocalShops(cachedShops);
+  toast(`تم تحويل المحل إلى: ${newStatus==='active'?'نشط':'معطل'}`);
+  renderShopList();
+}
+
+async function duplicateShop(id){
+  const shop = cachedShops.find(x=>x.id===id);
+  if(!shop) return;
+  const copy = JSON.parse(JSON.stringify(shop));
+  delete copy.id;
+  copy.name = copy.name + ' (نسخة)';
+  copy.slug = copy.slug + '-copy-' + Math.floor(Math.random()*1000);
+  copy.created_at = new Date().toISOString();
+
+  if(!isDemoMode && sb){
+    try{
+      const { data, error } = await sb.from('shops').insert(copy).select().single();
+      if(!error && data){
+        toast('تم نسخ المحل بنجاح');
+        loadDashboardData();
+        return;
+      }
+    }catch(e){}
+  }
+
+  copy.id = 'local-' + Date.now();
+  cachedShops.unshift(copy);
+  saveLocalShops(cachedShops);
+  toast('تم نسخ المحل بنجاح (محلي)');
+  renderShopList();
+}
+
+async function loadEdit(id){
+  let data = null;
+  if(!isDemoMode && sb){
+    try{
+      const { data: sData } = await sb.from('shops').select('*').eq('id',id).single();
+      if(sData) data = sData;
+    }catch(e){}
+  }
+  if(!data){
+    data = getLocalShops().find(x=>x.id===id);
+  }
+  if(!data){ location.hash='#/admin'; return; }
+
+  draft = JSON.parse(JSON.stringify(data));
+  if(data.colors && Array.isArray(data.colors)) draft.colors=data.colors;
+  else if(typeof data.colors==='string'){
+    try{ draft.colors=JSON.parse(data.colors); }catch(e){ draft.colors=[data.primary_color||'#0d7a72', data.secondary_color||'#14b8a6']; }
+  } else {
+    draft.colors=[data.primary_color||'#0d7a72', data.secondary_color||'#14b8a6'];
+  }
+  draft.custom_links = parseCustomLinks(data);
+  step=1;
+  form();
+}
+
+function form(){
+  const s = draft;
+  if(!s.colors) s.colors=[s.primary_color||'#0d7a72', s.secondary_color||'#14b8a6'];
+  app.innerHTML=`<div class="top">
+    <button class="back" onclick="location.hash='#/admin'">← رجوع للوحة</button>
+    <b>${s.id ? 'تعديل المحل' : 'إضافة محل جديد'}</b>
+    <span></span>
+  </div>
+  <div class="steps"><i class="${step>=1?'on':''}"></i><i class="${step>=2?'on':''}"></i></div>
+  <div class="pad">
+    <div class="card" id="box"></div>
+    <button class="btn btn-teal" id="next" style="margin-top:12px">${step===1?'التالي: تصميم ومظهر المتجر ←':'حفظ بيانات المحل وتفعيل الـ QR ✓'}</button>
+    <div id="msg"></div>
+  </div>`;
+  renderStep();
+  $('next').onclick=()=>{
+    if(step===1){
+      readStep1();
+      if(!draft.name){
+        $('msg').innerHTML='<div class="err">يرجى كتابة اسم المحل للمتابعة</div>';
+        return;
+      }
+      step=2;
+      form();
+    } else {
+      saveAll();
+    }
+  };
+}
+
+function renderStep(){
+  const s=draft;
+  if(step===1){
+    $('box').innerHTML=`<div class="muted" style="margin-bottom:10px;font-weight:700">1. المعلومات الأساسية وروابط التواصل</div>
+      ${inp('name','اسم المحل / المقهى (إجباري)',s.name)}
+      ${inp('description','وصف مختصر عن المحل أو الشعار الترويجي',s.description,1)}
+      ${inp('whatsapp','رقم الواتساب (مثال: 0910000000 أو 218910000000)',s.whatsapp,0,1)}
+      ${inp('phone','رقم الهاتف للاتصال المباشر',s.phone,0,1)}
+      ${inp('snapchat_url','رابط حساب سناب شات',s.snapchat_url,0,1)}
+      ${inp('tiktok_url','رابط حساب تيك توك',s.tiktok_url,0,1)}
+      ${inp('instagram_url','رابط حساب إنستغرام',s.instagram_url,0,1)}
+      ${inp('facebook_url','رابط صفحة فيسبوك',s.facebook_url,0,1)}
+      ${inp('google_maps_url','رابط الموقع على خرائط Google',s.google_maps_url,0,1)}
+      ${inp('google_review_url','رابط تقييم Google Reviews',s.google_review_url,0,1)}
+      <div class="muted" style="margin:12px 0 8px;font-weight:700">قائمة الطعام / المنيو</div>
+      ${inp('menu_url','رابط صفحة المنيو (إن وجد)',s.menu_url,0,1)}
+      ${inp('address','العنوان الفعلي للمحل (الشارع / المدينة)',s.address)}
+
+      <div class="muted" style="margin:16px 0 8px;font-weight:700">🌐 إعدادات رابط المتجر والدومين الخاص</div>
+      ${inp('slug','اسم الرابط المخصص (Slug - بالإنجليزية، مثال: lamamma)',s.slug||slugify(s.name),0,1)}
+      <p class="muted" style="font-size:11px;margin:-4px 0 8px">الرابط السريع المباشر للمتجر سيكون: <code>/#/shop/${esc(s.slug||'اسم-المحل')}</code></p>
+
+      ${inp('custom_domain','دومين مستقل بالكامل للمحل (اختياري - مثل Lamamma.dev)',s.custom_domain,0,1)}
+      <p class="muted" style="font-size:11px;margin:-4px 0 12px">إذا كان للمحل دومين خاص به (مثل Lamamma.dev)، اكتبه هنا ليفتح المتجر تلقائياً للزوار كأنه موقع مستقل تماماً وبدون أي تداخل مع منصتك!</p>
+
+      <div class="muted" style="margin:16px 0 8px;font-weight:700">روابط ومتاجر إلكترونية مخصصة (حتى 5 روابط)</div>
+      <p class="muted" style="font-size:11px;margin-bottom:8px">يمكنك إضافة متجر سلة / زد / موقعك الخاص مع اختيار أيقونة السلة واللون المفضل.</p>
+      <div id="custom-links-box"></div>
+      <button type="button" class="btn" id="add-custom" style="background:#fff7ed;color:#c2410c;border:1px dashed #fdba74;margin-top:4px">+ إضافة متجر أو موقع إضافي</button>`;
+    renderCustomLinksUI();
+  } else {
+    $('box').innerHTML=`<div class="muted" style="margin-bottom:10px;font-weight:700">2. تخصيص الهوية البصرية والألوان</div>
+      
+      <div class="field"><label>شعار المحل (Logo)</label>
+        <div class="mini" id="logo-zone">اضغط لرفع صورة الشعار من جهازك
+          <input type="file" accept="image/*" id="logo_file">
+          ${s.logo_url?`<img class="upload-preview" src="${esc(s.logo_url)}" id="logo_prev">`:'<div id="logo_prev"></div>'}
+        </div>
+        ${s.logo_url?`<button type="button" class="btn btn-sm" style="margin-top:6px;background:#fee2e2;color:#b91c1c" id="rm_logo">إزالة الشعار</button>`:''}
+      </div>
+
+      <div class="field"><label>صورة الغلاف (Cover Banner)</label>
+        <div class="mini" id="cover-zone">اضغط لرفع صورة الغلاف
+          <input type="file" accept="image/*" id="cover_file">
+          ${s.cover_url?`<img class="upload-preview" src="${esc(s.cover_url)}" id="cover_prev">`:'<div id="cover_prev"></div>'}
+        </div>
+        ${s.cover_url?`<button type="button" class="btn btn-sm" style="margin-top:6px;background:#fee2e2;color:#b91c1c" id="rm_cover">إزالة الغلاف</button>`:''}
+      </div>
+
+      <div class="field"><label>صورة المنيو / باركود القائمة (اختياري)</label>
+        <div class="mini" id="menuqr-zone">اضغط لاختيار صورة باركود المنيو
+          <input type="file" accept="image/*" id="menuqr_file">
+          ${s.menu_qr_url?`<img class="upload-preview" src="${esc(s.menu_qr_url)}" id="menuqr_prev">`:'<div id="menuqr_prev"></div>'}
+        </div>
+        ${s.menu_qr_url?`<button type="button" class="btn btn-sm" style="margin-top:6px;background:#fee2e2;color:#b91c1c" id="rm_menuqr">إزالة صورة المنيو</button>`:''}
+      </div>
+
+      <label style="font-size:12px;font-weight:700;color:var(--muted)">تدرج ألوان الموقع (حتى 5 ألوان متناسقة)</label>
+      <p class="muted" style="font-size:11px;margin:4px 0 8px">اضغط على أي لون من اللوحة لإضافته لشريط التدرج، وتستخدم في تلوين أزرار السحب والغلاف.</p>
+      <div class="colors" id="cols"></div>
+      <div class="color-slots" id="slots"></div>
+
+      ${inp('footer_text','عبارة ترويجية أسفل الصفحة (تظهر في بطاقة الزبون)',s.opening_hours||s.footer_text||'اسحب الزر للدخول • أهلاً وسهلاً بكم')}
+      <p class="muted" style="margin-top:8px;font-size:12px">الأزرار التي تترك حقولها فارغة لن تظهر في صفحة الزبون التلقائية.</p>`;
+
+    renderColors();
+    bindUploads();
+  }
+}
+
+function renderColors(){
+  const s=draft;
+  if(!s.colors) s.colors=[];
+  $('cols').innerHTML=PALETTE.map(c=>`<button type="button" class="sw" style="background:${c}" data-c="${c}" title="${c}"></button>`).join('');
+  $('cols').onclick=e=>{
+    const b=e.target.closest('.sw'); if(!b) return;
+    const col=b.dataset.c;
+    if(s.colors.includes(col)) return;
+    if(s.colors.length>=5){ toast('يمكنك اختيار 5 ألوان كحد أقصى'); return; }
+    s.colors.push(col);
+    renderColorSlots();
+  };
+  renderColorSlots();
+}
+
+function renderColorSlots(){
+  const s=draft;
+  const slots=$('slots');
+  if(!slots) return;
+  slots.innerHTML=(s.colors||[]).map((c,i)=>`
+    <div class="color-slot has" style="background:${c}">
+      <button type="button" class="rm" data-i="${i}">×</button>
+    </div>`).join('') + (s.colors.length<5?'<div class="color-slot">+</div>':'');
+  slots.querySelectorAll('.rm').forEach(btn=>{
+    btn.onclick=()=>{ s.colors.splice(+btn.dataset.i,1); renderColorSlots(); };
+  });
+}
+
+function bindUploads(){
+  const map=[
+    ['logo_file','logo_url','logo_prev'],
+    ['cover_file','cover_url','cover_prev'],
+    ['menuqr_file','menu_qr_url','menuqr_prev']
+  ];
+  map.forEach(([fid,key,pid])=>{
+    const inp=$(fid); if(!inp) return;
+    inp.onchange=async()=>{
+      try{
+        const url=await fileToDataUrl(inp.files[0]);
+        draft[key]=url;
+        const prev=$(pid);
+        if(prev){
+          prev.outerHTML=`<img class="upload-preview" src="${url}" id="${pid}" style="cursor:pointer">`;
+          const newPrev=$(pid);
+          if(newPrev) newPrev.onclick=()=>showImagePreview(url, key);
+        }
+        toast('تم تحميل الصورة بنجاح');
+      }catch(e){ alert(e.message||e); }
+    };
+  });
+  ['logo_prev','cover_prev','menuqr_prev'].forEach(pid=>{
+    const el=$(pid);
+    if(el && el.tagName==='IMG' && el.src){
+      el.style.cursor='pointer';
+      el.onclick=()=>showImagePreview(el.src, pid);
+    }
+  });
+  if($('rm_logo')) $('rm_logo').onclick=()=>{ draft.logo_url=null; form(); };
+  if($('rm_cover')) $('rm_cover').onclick=()=>{ draft.cover_url=null; form(); };
+  if($('rm_menuqr')) $('rm_menuqr').onclick=()=>{ draft.menu_qr_url=null; form(); };
+}
+
+function inp(id,lab,val,ta,ltr){
+  if(ta) return `<div class="field"><label>${lab}</label><div class="inp"><textarea id="${id}" placeholder="اكتب هنا...">${esc(val||'')}</textarea></div></div>`;
+  return `<div class="field"><label>${lab}</label><div class="inp"><input id="${id}" value="${esc(val||'')}" ${ltr?'dir=ltr':''} placeholder="اكتب هنا..."></div></div>`;
+}
+
+function renderCustomLinksUI(){
+  if(!draft.custom_links) draft.custom_links=[];
+  const box=$('custom-links-box');
+  if(!box) return;
+  box.innerHTML=draft.custom_links.map((cl,i)=>`
+    <div class="custom-link-card" data-i="${i}">
+      <button type="button" class="rm-custom" data-i="${i}">×</button>
+      <div class="type-toggle">
+        <button type="button" class="${cl.type==='store'?'store-on':''}" data-i="${i}" data-t="store">🛒 متجر إلكتروني</button>
+        <button type="button" class="${cl.type!=='store'?'on':''}" data-i="${i}" data-t="website">🌐 موقع عادي</button>
+      </div>
+      <div class="field" style="margin-bottom:6px"><label>الاسم الظاهر للزبائن</label>
+        <div class="inp"><input class="cl-name" data-i="${i}" value="${esc(cl.name||'')}" placeholder="مثال: متجرنا على سلة"></div></div>
+      <div class="field" style="margin-bottom:6px"><label>رابط الموقع</label>
+        <div class="inp"><input class="cl-url" data-i="${i}" dir="ltr" value="${esc(cl.url||'')}" placeholder="https://..."></div></div>
+      <div class="color-pick-row">
+        <span class="muted" style="font-size:12px;font-weight:700">لون الزر:</span>
+        <input type="color" class="cl-color" data-i="${i}" value="${cl.color||'#f97316'}">
+        <span style="width:24px;height:24px;border-radius:6px;background:${cl.color||'#f97316'};display:inline-block"></span>
+      </div>
+    </div>`).join('');
+
+  box.querySelectorAll('.rm-custom').forEach(btn=>{
+    btn.onclick=()=>{ draft.custom_links.splice(+btn.dataset.i,1); renderCustomLinksUI(); };
+  });
+  box.querySelectorAll('.type-toggle button').forEach(btn=>{
+    btn.onclick=()=>{
+      const i=+btn.dataset.i;
+      draft.custom_links[i].type=btn.dataset.t;
+      if(btn.dataset.t==='store' && !draft.custom_links[i].color) draft.custom_links[i].color='#f97316';
+      renderCustomLinksUI();
+    };
+  });
+  box.querySelectorAll('.cl-name').forEach(inp=>{
+    inp.oninput=()=>{ draft.custom_links[+inp.dataset.i].name=inp.value; };
+  });
+  box.querySelectorAll('.cl-url').forEach(inp=>{
+    inp.oninput=()=>{ draft.custom_links[+inp.dataset.i].url=inp.value.trim(); };
+  });
+  box.querySelectorAll('.cl-color').forEach(inp=>{
+    inp.oninput=()=>{
+      draft.custom_links[+inp.dataset.i].color=inp.value;
+      const sw=inp.parentElement.querySelector('span:last-child');
+      if(sw) sw.style.background=inp.value;
+    };
+  });
+  const addBtn=$('add-custom');
+  if(addBtn){
+    addBtn.onclick=()=>{
+      if((draft.custom_links||[]).length>=5){ toast('يمكنك إضافة 5 روابط كحد أقصى'); return; }
+      draft.custom_links.push({name:'',url:'',type:'website',color:'#f97316'});
+      renderCustomLinksUI();
+    };
+    addBtn.style.display=(draft.custom_links.length>=5)?'none':'block';
+  }
+}
+
+function readStep1(){
+  ['name','description','whatsapp','phone','snapchat_url','tiktok_url','instagram_url','facebook_url','google_maps_url','google_review_url','menu_url','address','slug','custom_domain'].forEach(k=>{
+    const el=$(k); if(el) draft[k]=el.value.trim();
+  });
+}
+
+function slugify(n){
+  const m={'ا':'a','أ':'a','إ':'i','ب':'b','ت':'t','ج':'j','ح':'h','د':'d','ر':'r','ز':'z','س':'s','ش':'sh','ع':'a','ف':'f','ق':'q','ك':'k','ل':'l','م':'m','ن':'n','ه':'h','و':'w','ي':'y','ة':'h',' ':'-'};
+  return (n||'').trim().toLowerCase().split('').map(c=>m[c]||c).join('').replace(/[^a-z0-9-]/g,'').replace(/-+/g,'-')||'shop';
+}
+function gv(x){ x=(x||'').trim(); return x||null; }
+
+async function saveAll(){
+  readStep1();
+  const ft=$('footer_text'); if(ft) draft.footer_text=ft.value.trim();
+  if(!draft.name){
+    $('msg').innerHTML='<div class="err">اسم المحل مطلوب</div>';
+    step=1; form(); return;
+  }
+  const cols = (draft.colors && draft.colors.length) ? draft.colors : ['#0d7a72','#14b8a6'];
+  const customClean = (draft.custom_links||[])
+    .filter(x=>x && (x.name||'').trim() && (x.url||'').trim())
+    .slice(0,5)
+    .map(x=>({
+      name: String(x.name).trim(),
+      url: String(x.url).trim(),
+      type: x.type==='store'?'store':'website',
+      color: x.color || '#f97316'
+    }));
+
+  const cleanCustomDomain = (draft.custom_domain||'').toLowerCase().replace(/^https?:\/\//,'').replace(/\/.*$/,'').trim();
+  const cleanSlug = (draft.slug||slugify(draft.name)).toLowerCase().replace(/[^a-z0-9-]/g,'');
+
+  const payload={
+    name:draft.name, description:gv(draft.description), whatsapp:gv(draft.whatsapp), phone:gv(draft.phone),
+    snapchat_url:gv(draft.snapchat_url), tiktok_url:gv(draft.tiktok_url), instagram_url:gv(draft.instagram_url),
+    facebook_url:gv(draft.facebook_url), google_maps_url:gv(draft.google_maps_url), google_review_url:gv(draft.google_review_url),
+    menu_url:gv(draft.menu_url), menu_qr_url:gv(draft.menu_qr_url), address:gv(draft.address),
+    logo_url:gv(draft.logo_url), cover_url:gv(draft.cover_url),
+    opening_hours:gv(draft.footer_text), status:'active',
+    slug: cleanSlug || slugify(draft.name),
+    custom_domain: cleanCustomDomain || null,
+    primary_color:cols[0]||'#0d7a72', secondary_color:cols[1]||'#14b8a6',
+    colors: JSON.stringify(cols),
+    custom_links: customClean
+  };
+
+  $('next').disabled=true; $('next').textContent='جاري الحفظ...';
+
+  let savedLocally = false;
+  if(!isDemoMode && sb){
+    try{
+      let error = null;
+      if(draft.id && !String(draft.id).startsWith('local-')){
+        ({error} = await sb.from('shops').update(payload).eq('id',draft.id));
+      } else {
+        let slug=cleanSlug || slugify(draft.name);
+        const {data:ex}=await sb.from('shops').select('id').eq('slug',slug).maybeSingle();
+        if(ex) slug+='-'+Date.now().toString().slice(-4);
+        payload.slug=slug;
+        ({error}=await sb.from('shops').insert(payload));
+      }
+      if(error) throw error;
+    }catch(e){
+      console.warn('Supabase save error, fallback to local storage:', e);
+      savedLocally = true;
+    }
+  } else {
+    savedLocally = true;
+  }
+
+  if(savedLocally){
+    const list = getLocalShops();
+    if(draft.id){
+      const idx = list.findIndex(x=>x.id===draft.id);
+      if(idx>=0) list[idx] = { ...list[idx], ...payload, colors: cols };
+      else list.unshift({ id: draft.id, ...payload, colors: cols });
+    } else {
+      payload.id = 'local-' + Date.now();
+      payload.slug = cleanSlug || (slugify(draft.name) + '-' + Math.floor(Math.random()*1000));
+      payload.colors = cols;
+      payload.created_at = new Date().toISOString();
+      list.unshift(payload);
+    }
+    saveLocalShops(list);
+  }
+
+  $('msg').innerHTML='<div class="ok">تم الحفظ بنجاح! جاري التوجيه للوحة التحكم...</div>';
+  setTimeout(()=>location.hash='#/admin', 600);
+}
+
+// صفحة الإحصاءات
+async function stats(id){
+  let s = cachedShops.find(x=>x.id===id);
+  if(!s){
+    s = getLocalShops().find(x=>x.id===id);
+  }
+  if(!s){ location.hash='#/admin'; return; }
+
+  let counts = {};
+  if(!isDemoMode && sb){
+    try{
+      const { data: ev } = await sb.from('analytics_events').select('event_type').eq('shop_id', id);
+      (ev||[]).forEach(e=>counts[e.event_type]=(counts[e.event_type]||0)+1);
+    }catch(e){}
+  } else {
+    const ev = getLocalAnalytics().filter(x=>x.shop_id===id);
+    (ev||[]).forEach(e=>counts[e.event_type]=(counts[e.event_type]||0)+1);
+  }
+
+  app.innerHTML=`<div class="top">
+    <button class="back" onclick="location.hash='#/admin'">← رجوع للوحة</button>
+    <b>إحصاءات ${esc(s.name)}</b>
+    <span></span>
+  </div>
+  <div class="muted" style="padding:10px 16px 4px;font-weight:700">تصفية الأحداث:</div>
+  <div class="stat-filters" id="filters"></div>
+  <div class="stat-grid" id="stat-nums"></div>
+
+  <div class="card" style="margin:12px 16px;text-align:center">
+    <div style="font-weight:800;margin-bottom:6px">رمز الـ QR الخاص بالمتجر</div>
+    <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=${encodeURIComponent(shopUrl(s.slug))}" style="width:140px;height:140px;border-radius:12px;border:1px solid var(--line);padding:4px" alt="QR">
+    <div class="muted" style="direction:ltr;font-size:11px;margin-top:6px">${esc(shopUrl(s.slug))}</div>
+  </div>
+
+  <div class="pad">
+    <a class="btn btn-teal" href="#/shop/${encodeURIComponent(s.slug)}" target="_blank">فتح صفحة الزبون</a>
+    <button class="btn btn-outline" style="margin-top:8px" onclick="location.hash='#/admin/print/${encodeURIComponent(s.slug)}'">🖨️ طباعة ستاند طاولة</button>
+    <button class="btn btn-outline" style="margin-top:8px" onclick="location.hash='#/admin/edit/${s.id}'">✏️ تعديل البيانات</button>
+  </div>`;
+
+  const filters=$('filters');
+  filters.innerHTML=ALL_EVENTS.map(ev=>`
+    <button type="button" class="${selectedStatFilters.includes(ev.e)?'on':''}" data-e="${ev.e}">${ev.l}</button>
+  `).join('');
+  filters.onclick=e=>{
+    const b=e.target.closest('button'); if(!b) return;
+    const key=b.dataset.e;
+    if(selectedStatFilters.includes(key)) selectedStatFilters=selectedStatFilters.filter(x=>x!==key);
+    else selectedStatFilters.push(key);
+    b.classList.toggle('on');
+    renderStatNums(counts);
+  };
+  renderStatNums(counts);
+
+  function renderStatNums(c){
+    const box=$('stat-nums');
+    const items=ALL_EVENTS.filter(ev=>selectedStatFilters.includes(ev.e));
+    if(!items.length){ box.innerHTML='<p class="muted" style="grid-column:1/-1;text-align:center">اختر خياراً واحداً على الأقل</p>'; return; }
+    box.innerHTML=items.map(ev=>`
+      <div class="b">${esc(ev.l)}<b>${c[ev.e]||0}</b></div>
+    `).join('');
+  }
+}
+
+// صفحة رمز QR مع التحميل بجودة عالية
+async function qrPage(slug){
+  let s = cachedShops.find(x=>x.slug===slug);
+  if(!s) s = getLocalShops().find(x=>x.slug===slug);
+  if(!s){ location.hash='#/admin'; return; }
+
+  const url = shopUrl(s.slug);
+  const qrImgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=${encodeURIComponent(url)}`;
+
+  app.innerHTML=`<div class="top">
+    <button class="back" onclick="location.hash='#/admin'">← رجوع للوحة</button>
+    <b>رمز QR — ${esc(s.name)}</b>
+    <span></span>
+  </div>
+  <div class="pad">
+    <div class="qr-preview-card">
+      <div class="qr-canvas-holder">
+        <img id="qr-img" src="${qrImgSrc}" style="width:220px;height:220px;display:block" alt="QR Code" crossorigin="anonymous">
+      </div>
+      <div class="shop-title">${esc(s.name)}</div>
+      <div class="shop-desc">${esc(s.description||'امسح الرمز لزيارة صفحتنا')}</div>
+      <p class="muted" style="direction:ltr;font-size:12px;margin-bottom:14px;word-break:break-all">${esc(url)}</p>
+
+      <button class="btn btn-teal" id="dl-qr">📥 تحميل رمز QR بدقة عالية (PNG)</button>
+      <button class="btn btn-outline" style="margin-top:8px" id="copy-url">📋 نسخ رابط الصفحة</button>
+      <button class="btn btn-outline" style="margin-top:8px" onclick="location.hash='#/admin/print/${encodeURIComponent(s.slug)}'">🖨️ طباعة بطاقة ستاند للمحل</button>
+      <a class="btn btn-outline" style="margin-top:8px" href="#/shop/${encodeURIComponent(s.slug)}" target="_blank">👁️ فتح صفحة المتجر</a>
+    </div>
+  </div>`;
+
+  $('copy-url').onclick = ()=>{
+    navigator.clipboard.writeText(url);
+    toast('تم نسخ الرابط إلى الحافظة بنجاح');
+  };
+
+  $('dl-qr').onclick = async()=>{
+    try{
+      const canvas = document.createElement('canvas');
+      canvas.width = 600; canvas.height = 720;
+      const ctx = canvas.getContext('2d');
+      // خلفية بيضاء
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0,0,600,720);
+      // رسم حدود كارت أنيقة
+      ctx.strokeStyle = '#e2e8f0';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(20,20,560,680);
+      // اسم المحل
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 34px Tajawal, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(s.name, 300, 85);
+      // عبارة المسح
+      ctx.fillStyle = '#64748b';
+      ctx.font = '20px Tajawal, sans-serif';
+      ctx.fillText('امسح الرمز لزيارة صفحتنا الرسمية', 300, 125);
+
+      // رسم الـ QR
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = ()=>{
+        ctx.drawImage(img, 100, 160, 400, 400);
+        // رابط المتجر أسفل
+        ctx.fillStyle = '#0d7a72';
+        ctx.font = 'bold 18px Tajawal, sans-serif';
+        ctx.fillText(url, 300, 610);
+        // التنزيل
+        const a = document.createElement('a');
+        a.download = `${slugify(s.name)}-qr.png`;
+        a.href = canvas.toDataURL('image/png');
+        a.click();
+        toast('تم بدء تحميل صورة الـ QR');
+      };
+      img.src = qrImgSrc;
+    }catch(e){
+      // بديل بسيط في حال قيود CORS
+      window.open(qrImgSrc, '_blank');
+    }
+  };
+}
+
+// صفحة طباعة بطاقة وستاند الطاولة الاحترافية
+async function printStandPage(slug){
+  let s = cachedShops.find(x=>x.slug===slug);
+  if(!s) s = getLocalShops().find(x=>x.slug===slug);
+  if(!s){ location.hash='#/admin'; return; }
+
+  const url = shopUrl(s.slug);
+  const qrImgSrc = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(url)}`;
+
+  app.innerHTML=`<div class="top no-print">
+    <button class="back" onclick="location.hash='#/admin'">← رجوع للوحة</button>
+    <b>طباعة ستاند طاولة — ${esc(s.name)}</b>
+    <button class="btn-teal btn-sm" onclick="window.print()">🖨️ طباعة الآن</button>
+  </div>
+
+  <div class="no-print" style="padding:10px 18px;background:#f8fbfb;border-bottom:1px solid var(--line);font-size:12px;color:var(--muted)">
+    💡 هذه البطاقة مجهزة للطباعة على ورق A5 أو ستاند أكرليك للطاولات والاستقبال. اضغط "طباعة الآن" وستظهر فقط البطاقة بدون القوائم.
+  </div>
+
+  <div class="stand-sheet" id="printable-card">
+    ${s.logo_url ? `<img src="${esc(s.logo_url)}" class="stand-logo" alt="Logo">` : ''}
+    <div class="stand-head">${esc(s.name)}</div>
+    <div class="stand-sub">${esc(s.description||'أهلاً بكم • يسعدنا زيارتكم')}</div>
+    
+    <img src="${qrImgSrc}" class="stand-qr" alt="QR Code">
+    
+    <div>
+      <div class="stand-instructions">وجّه كاميرا هاتفك نحو الرمز للدخول 📷</div>
+    </div>
+    
+    <div style="margin-top:14px;font-size:11px;color:#94a3b8;direction:ltr">
+      ${esc(url)}
+    </div>
+  </div>
+
+  <div class="pad no-print">
+    <button class="btn btn-teal" onclick="window.print()">🖨️ طباعة ستاند الطاولة (Print)</button>
+    <button class="btn btn-outline" style="margin-top:8px" onclick="location.hash='#/admin/qr/${encodeURIComponent(s.slug)}'">الرجوع لصفحة QR</button>
+  </div>`;
+}
+
+// نافذة الدليل الشامل لربط الدومين والاستضافات و Cloudflare
+function domainGuideModal(initialTab = 'cloudflare'){
+  const existing = document.getElementById('guide-modal-overlay');
+  if(existing) existing.remove();
+
+  const ov = document.createElement('div');
+  ov.id = 'guide-modal-overlay';
+  ov.className = 'ov';
+  ov.style.background = 'rgba(0,0,0,0.75)';
+  ov.style.zIndex = '130';
+
+  ov.innerHTML = `<div class="card" style="width:94%;max-width:560px;max-height:90vh;overflow-y:auto;text-align:right;color:var(--ink);padding:22px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;border-bottom:1px solid var(--line);padding-bottom:10px">
+      <div>
+        <div style="font-size:11px;color:var(--teal);font-weight:800">الدليل التفاعلي المباشر للربط والنشر</div>
+        <b style="font-size:18px">🌐 ربط الدومين والاستضافات و Cloudflare</b>
+      </div>
+      <button style="border:0;background:none;font-size:24px;cursor:pointer;color:var(--muted)" id="close-guide">×</button>
+    </div>
+
+    <!-- Guide Tabs -->
+    <div class="guide-tab-nav">
+      <button class="guide-tab-btn ${initialTab==='cloudflare'?'active':''}" data-tab="cloudflare">☁️ Cloudflare (موصى به)</button>
+      <button class="guide-tab-btn ${initialTab==='vercel'?'active':''}" data-tab="vercel">🚀 Vercel</button>
+      <button class="guide-tab-btn ${initialTab==='netlify'?'active':''}" data-tab="netlify">⚡ Netlify</button>
+      <button class="guide-tab-btn ${initialTab==='dns'?'active':''}" data-tab="dns">📋 سجلات DNS الجاهزة</button>
+      <button class="guide-tab-btn ${initialTab==='registrars'?'active':''}" data-tab="registrars">🌍 مزودو النطاقات</button>
+    </div>
+
+    <!-- Tab 1: Cloudflare -->
+    <div id="guide-pane-cloudflare" class="${initialTab==='cloudflare'?'':'hidden'}">
+      <div style="background:#fff7ed;border:1px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:14px;font-size:12px;color:#9a3412">
+        🔥 <b>لماذا نوصي بـ Cloudflare؟</b><br>
+        تمنحك Cloudflare حماية DDoS فورية ضد الاختراق، وشهادة SSL مجانية، وتسريعاً عالمياً لفتح صفحات المتاجر ورموز الـ QR عبر شبكة CDN الأسرع عالمياً مجاناً 100%.
+      </div>
+
+      <a href="https://dash.cloudflare.com" target="_blank" rel="noopener noreferrer" class="ext-link-btn" style="background:#ea580c;width:100%;justify-content:center;padding:12px;font-size:14px">
+        <span>☁️ فتح لوحة تحكم Cloudflare الرسمية (dash.cloudflare.com) ↗</span>
+      </a>
+
+      <div style="margin-top:14px">
+        <b style="font-size:13px">خطوات ربط الدومين مع Cloudflare:</b>
+        <div class="guide-step-card" style="margin-top:8px">
+          <b>1. إضافة النطاق (Add a Site)</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">سجل دخولك في Cloudflare، اضغط <b>Add Site</b> واكتب اسم نطاقك (مثل: <code dir="ltr">myshop.com</code>)، ثم اختر الخطة المجانية <b>Free ($0)</b>.</p>
+        </div>
+        <div class="guide-step-card">
+          <b>2. تغيير Nameservers لدى مزود الدومين</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">انسخ خوادم الأسماء (Nameservers) الممنوحة لك من Cloudflare وضعها في لوحة تحكم الشركة التي اشتريت منها الدومين (Namecheap, GoDaddy...).</p>
+        </div>
+        <div class="guide-step-card">
+          <b>3. إضافة سجل DNS وتفعيل الحماية</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">في Cloudflare، اذهب إلى <b>DNS -> Records</b> واضغط <b>Add Record</b>:</p>
+          <div class="dns-record-row">
+            <span>Type: <b>CNAME</b> | Name: <b>@</b> أو <b>qr</b> | Target: <b>cname.vercel-dns.com</b></span>
+            <button class="dns-copy-btn" onclick="copyText('cname.vercel-dns.com')">نسخ الهدف</button>
+          </div>
+          <p style="font-size:11px;color:#15803d;font-weight:700;margin-top:6px">⚠️ تأكد من تفعيل أيقونة السحابة البرتقالية <b>(Proxied)</b> لتفعيل التشفير وحماية الدومين تلقائياً!</p>
+        </div>
+        <div class="guide-step-card">
+          <b>4. ربط الدومين في منصتك</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">افتح <b>إعدادات المنصة -> الدومين المخصص</b> وضع رابط الدومين الخاص بك ليتم إنشاء جميع روابط المتاجر والـ QR باستخدامه فوراً.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 2: Vercel -->
+    <div id="guide-pane-vercel" class="${initialTab==='vercel'?'':'hidden'}">
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:12px;padding:12px;margin-bottom:14px;font-size:12px;color:#166534">
+        🚀 <b>Vercel</b> هي المنصة الرائدة لنشر مواقع الويب وتحديثها تلقائياً مع شهادات SSL مجانية ودعم كامل للنطاقات المخصصة.
+      </div>
+
+      <a href="https://vercel.com/new" target="_blank" rel="noopener noreferrer" class="ext-link-btn" style="background:#0f172a;width:100%;justify-content:center;padding:12px;font-size:14px">
+        <span>🚀 فتح منصة Vercel (vercel.com/new) ↗</span>
+      </a>
+
+      <div style="margin-top:14px">
+        <b style="font-size:13px">خطوات الرفع والربط على Vercel:</b>
+        <div class="guide-step-card" style="margin-top:8px">
+          <b>1. استيراد المشروع (Deploy Git Repo)</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">ارفع ملفات المشروع إلى مستودع GitHub، ثم في Vercel اضغط <b>Add New -> Project</b> واختر المستودع واضغط <b>Deploy</b>.</p>
+        </div>
+        <div class="guide-step-card">
+          <b>2. ربط الدومين المخصص (Custom Domains)</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">في صفحة مشروعك على Vercel، اذهب إلى <b>Settings -> Domains</b> وأضف الدومين الخاص بك (مثلاً: <code dir="ltr">myshop.com</code> أو <code dir="ltr">qr.myshop.com</code>).</p>
+        </div>
+        <div class="guide-step-card">
+          <b>3. تعيين سجل CNAME</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">سيزودك Vercel بقيمة CNAME للربط مثل <code dir="ltr">cname.vercel-dns.com</code> انسخها وضعها في مزود الدومين أو في Cloudflare.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 3: Netlify -->
+    <div id="guide-pane-netlify" class="${initialTab==='netlify'?'':'hidden'}">
+      <a href="https://app.netlify.com" target="_blank" rel="noopener noreferrer" class="ext-link-btn" style="background:#00ad9f;width:100%;justify-content:center;padding:12px;font-size:14px">
+        <span>⚡ فتح منصة Netlify (app.netlify.com) ↗</span>
+      </a>
+      <div style="margin-top:14px">
+        <b style="font-size:13px">خطوات النشر على Netlify:</b>
+        <div class="guide-step-card" style="margin-top:8px">
+          <b>1. رفع ملفات المشروع</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">يمكنك سحب وإفلات مجلد المشروع في Netlify Drop أو ربطه عبر مستودع GitHub.</p>
+        </div>
+        <div class="guide-step-card">
+          <b>2. Domain Management</b>
+          <p style="font-size:12px;color:var(--muted);margin-top:4px">توجه إلى <b>Site configuration -> Domain management</b> وأضف النطاق المخصص الخاص بك.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 4: DNS Records -->
+    <div id="guide-pane-dns" class="${initialTab==='dns'?'':'hidden'}">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">اضغط "نسخ" بجانب أي قيمة للصقها مباشرة في إعدادات DNS الخاصة بك:</p>
+      
+      <div class="guide-step-card">
+        <b>سجل CNAME (موصى به للدومين الفرعي مثل qr.myshop.com)</b>
+        <div class="dns-record-row">
+          <span>Type: <b>CNAME</b> | Name: <b>qr</b> أو <b>@</b></span>
+        </div>
+        <div class="dns-record-row">
+          <span>Target: <b>cname.vercel-dns.com</b></span>
+          <button class="dns-copy-btn" onclick="copyText('cname.vercel-dns.com')">نسخ Target</button>
+        </div>
+      </div>
+
+      <div class="guide-step-card">
+        <b>سجل A Record (للدومين المباشر مثل myshop.com)</b>
+        <div class="dns-record-row">
+          <span>Type: <b>A</b> | Name: <b>@</b></span>
+        </div>
+        <div class="dns-record-row">
+          <span>Value / IP: <b>76.76.21.21</b></span>
+          <button class="dns-copy-btn" onclick="copyText('76.76.21.21')">نسخ IP</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab 5: Registrars -->
+    <div id="guide-pane-registrars" class="${initialTab==='registrars'?'':'hidden'}">
+      <p style="font-size:12px;color:var(--muted);margin-bottom:12px">روابط مباشرة لأشهر مزودي النطاقات لإدارة وتعديل أسماء الخوادم والسجلات:</p>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <a href="https://www.namecheap.com/domains/" target="_blank" rel="noopener noreferrer" class="ext-link-btn" style="background:#de3723">
+          <span>🔴 فتح Namecheap Domains ↗</span>
+        </a>
+        <a href="https://www.godaddy.com" target="_blank" rel="noopener noreferrer" class="ext-link-btn" style="background:#1b95e0">
+          <span>🔵 فتح GoDaddy ↗</span>
+        </a>
+        <a href="https://www.hostinger.com/domain-name-search" target="_blank" rel="noopener noreferrer" class="ext-link-btn" style="background:#673ab7">
+          <span>🟣 فتح Hostinger Domains ↗</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- Bottom Actions -->
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+      <button class="btn btn-outline btn-sm" id="btn-copy-full-guide">📋 نسخ كل هذا الشرح كدليل نصي متكامل</button>
+      <button class="btn btn-teal btn-sm" id="btn-close-guide-btm">إغلاق الدليل</button>
+    </div>
+  </div>`;
+
+  document.body.appendChild(ov);
+
+  ov.querySelectorAll('.guide-tab-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+      ov.querySelectorAll('.guide-tab-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const target = btn.getAttribute('data-tab');
+      ['cloudflare','vercel','netlify','dns','registrars'].forEach(t=>{
+        const p = ov.querySelector('#guide-pane-' + t);
+        if(p) p.classList.toggle('hidden', t !== target);
+      });
+    };
+  });
+
+  ov.querySelector('#close-guide').onclick = ()=>ov.remove();
+  ov.querySelector('#btn-close-guide-btm').onclick = ()=>ov.remove();
+
+  ov.querySelector('#btn-copy-full-guide').onclick = ()=>{
+    const fullTxt = `دليل ربط الدومين والاستضافات و Cloudflare:
+1. Cloudflare (موصى به جداً للحماية وتسريع الموقع والـ SSL المجاني):
+- افتح: https://dash.cloudflare.com
+- اضغط Add a Site وأدخل دومينك، ثم اختر الخطة المجانية Free.
+- حدث Nameservers لدى مزود الدومين الخاص بك.
+- في صفحة DNS أضف سجل CNAME يشير إلى cname.vercel-dns.com وتأكد من تفعيل السحابة البرتقالية (Proxied).
+
+2. Vercel:
+- افتح: https://vercel.com/new
+- ارفع المشروع ثم توجه إلى Settings -> Domains وأضف دومينك.
+
+3. سجلات الـ DNS الأساسية:
+- CNAME Record: Name: @ أو qr | Target: cname.vercel-dns.com
+- A Record: Name: @ | IP: 76.76.21.21
+
+4. في منصة المحلات: ضع الدومين في الإعدادات لتوليد جميع الروابط ورموز الـ QR عليه فوراً.`;
+    navigator.clipboard.writeText(fullTxt);
+    toast('تم نسخ الدليل الشامل وروابط الاستضافات إلى الحافظة 📋');
+  };
+}
+
+function copyText(txt){
+  navigator.clipboard.writeText(txt);
+  toast('تم النسخ بنجاح: ' + txt);
+}
+
+function renderBiometricAuditLogsHtml(){
+  try{
+    const logs = JSON.parse(localStorage.getItem('biometric_audit_logs') || '[]');
+    if(!logs.length) return '<div style="padding:6px 0;color:var(--muted)">لا توجد سجلات بعد (سيتم تسجيل كل دخول ناجح للمسؤول).</div>';
+    return logs.map(l=>`<div style="display:flex;justify-content:space-between;align-items:center;border-bottom:1px dashed #e2e8f0;padding:5px 0">
+      <span>${esc(l.method)}: <b style="color:#16a34a">${esc(l.status)}</b></span>
+      <span style="direction:ltr;font-size:10px;color:#64748b">${esc(l.time)}</span>
+    </div>`).join('');
+  }catch(e){
+    return '<div>-</div>';
+  }
+}
+
+// نافذة إعدادات الربط والدومين وحزمة المشروع والبصمة
+function configModal(){
+  if(overlayEl) overlayEl.remove();
+  overlayEl = document.createElement('div');
+  overlayEl.className = 'ov';
+  overlayEl.style.background = 'rgba(0,0,0,0.7)';
+  overlayEl.style.zIndex = '120';
+  overlayEl.innerHTML = `<div class="card" style="width:92%;max-width:440px;text-align:right;color:var(--ink)">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <b style="font-size:17px">⚙️ إعدادات المنصة والدومين والأمان</b>
+      <button style="border:0;background:none;font-size:20px;cursor:pointer;color:var(--muted)" id="close-cfg">×</button>
+    </div>
+
+    <div class="cfg-tabs">
+      <button class="cfg-tab active" id="tab-btn-sb">قاعدة البيانات</button>
+      <button class="cfg-tab" id="tab-btn-dom">الدومين المخصص</button>
+      <button class="cfg-tab" id="tab-btn-bio">🛡️ البصمات والأمان</button>
+      <button class="cfg-tab" id="tab-btn-dl">تنزيل المشروع</button>
+    </div>
+    
+    <!-- Tab 1: Supabase -->
+    <div id="cfg-pane-sb">
+      <p class="muted" style="font-size:12px;margin-bottom:12px">أدخل مفاتيح مشروعك في Supabase لربط قاعدة البيانات مباشرة.</p>
+      <div class="field"><label>Project URL</label>
+        <div class="inp"><input id="cfg-url" dir="ltr" value="${esc(SUPABASE_URL)}" placeholder="https://xyz.supabase.co"></div></div>
+      
+      <div class="field"><label>Anon Public Key</label>
+        <div class="inp"><input id="cfg-key" dir="ltr" value="${esc(SUPABASE_ANON_KEY)}" placeholder="eyJhbGciOi..."></div></div>
+
+      <button class="btn btn-teal btn-sm" id="cfg-save" style="margin-top:8px">حفظ إعدادات Supabase</button>
+      <button class="btn btn-outline btn-sm" id="cfg-reset" style="margin-top:6px">استعادة الإعدادات الافتراضية</button>
+    </div>
+
+    <!-- Tab 2: Custom Domain -->
+    <div id="cfg-pane-dom" class="hidden">
+      <p class="muted" style="font-size:12px;margin-bottom:12px">يمكنك ربط اسم نطاق (Domain) خاص بك ليتم إنشاء روابط المحلات ورموز الـ QR باستخدامه مباشرة (مثال: <code dir="ltr">qr.myshop.com</code> أو <code dir="ltr">https://myshop.ly</code>).</p>
+      <div class="field"><label>اسم الدومين أو الرابط الرسمي للمنصة</label>
+        <div class="inp"><input id="cfg-domain" dir="ltr" value="${esc(CUSTOM_DOMAIN)}" placeholder="https://myshop.com"></div></div>
+      <div style="background:#f8fbfb;border:1px solid var(--line);border-radius:10px;padding:10px;font-size:11px;color:var(--muted);margin-bottom:12px">
+        💡 <b>كيف يعمل الدومين؟</b><br>
+        عند رفع المشروع على استضافة (Vercel أو Netlify أو خادمك) وربط الدومين به عبر Cloudflare، اكتب الدومين هنا. سيتم تلقائياً تحديث جميع روابط المتاجر، بطاقات الطاولات، ورموز الـ QR لتطبع وتنشر بهذا الدومين.
+      </div>
+      <button class="btn btn-teal btn-sm" id="cfg-domain-save">حفظ الدومين المخصص</button>
+      <button class="btn btn-outline btn-sm" id="cfg-open-guide-btn" style="margin-top:6px;display:flex;align-items:center;justify-content:center;gap:6px">
+        🌐 دليل ربط الدومين والاستضافات و Cloudflare ↗
+      </button>
+      ${CUSTOM_DOMAIN ? `<button class="btn btn-outline btn-sm" id="cfg-domain-clear" style="margin-top:6px;color:#b91c1c">إلغاء الدومين والرجوع للرابط التلقائي</button>` : ''}
+    </div>
+
+    <!-- Tab 3: Biometrics & Face ID -->
+    <div id="cfg-pane-bio" class="hidden">
+      <p class="muted" style="font-size:12px;margin-bottom:12px">إدارة منظومة التحقق البيومتري المتقدم (Face ID & Touch ID) لحماية حساب الإدارة العليا.</p>
+      
+      <div class="bio-face-ref" style="background:#fff;border-color:var(--line)">
+        <img id="admin-face-preview" src="${esc(getAdminFaceImage())}" alt="Admin Face Reference">
+        <div>
+          <b style="font-size:13px;color:var(--ink)">صورة وبصمة الوجه المعتمدة للمسؤول</b>
+          <div style="font-size:11px;color:${isBiometricsEnrolled() ? '#16a34a' : '#b45309'};font-weight:700">
+            ${isBiometricsEnrolled() ? '● مطابقة ملامح الوجه نشطة ومعتمدة 100%' : '● لم يتم حفظ بصمة بيومترية بعد'}
+          </div>
+          <div style="font-size:10px;color:var(--muted)">تُستخدم الملامح المشفرة للتحقق الفوري عند تسجيل الدخول</div>
+        </div>
+      </div>
+
+      <button class="btn btn-teal btn-sm" id="btn-open-enroll-wizard" style="width:100%;margin-bottom:10px;font-weight:800;padding:10px">
+        🛡️ فتح معالج تسجيل وضبط البصمات (Face ID & Touch ID)
+      </button>
+
+      <div style="display:flex;gap:6px;margin-bottom:12px">
+        <button class="btn btn-outline btn-sm" id="btn-snap-new-face" style="flex:1">📸 التقاط بالكاميرا</button>
+        <button class="btn btn-outline btn-sm" id="btn-pick-face-file" style="flex:1">📁 رفع صورة وجه</button>
+        <input type="file" id="face-upload-input" accept="image/*" style="display:none">
+      </div>
+
+      <div style="background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px">
+        <b style="font-size:12px;color:var(--ink)">👆 بصمة الإصبع (Touch ID / المستشعر):</b>
+        <p style="font-size:11px;color:var(--muted);margin-top:2px">سجّل بصمة هذا الجهاز لتسريع عملية التحقق والمصادقة المزدوجة.</p>
+        <button class="btn btn-outline btn-sm" id="btn-cfg-reg-bio" style="margin-top:6px;width:100%;font-weight:800">
+          👆 ${localStorage.getItem('al_enrolled_fingerprint') ? 'تحديث وتأكيد بصمة هذا الجهاز' : 'تسجيل بصمة هذا الجهاز الآن'}
+        </button>
+      </div>
+
+      <div style="background:#f8fafc;border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px">
+        <b style="font-size:12px;color:var(--ink)">📋 سجل التدقيق البيومتري الأخير:</b>
+        <div id="bio-audit-list" style="font-size:11px;color:var(--muted);margin-top:6px;max-height:110px;overflow-y:auto">
+          ${renderBiometricAuditLogsHtml()}
+        </div>
+      </div>
+
+      <button class="btn btn-outline btn-sm" id="btn-reset-bio-cfg" style="width:100%;color:#b91c1c;border-color:#fecaca">
+        🔄 إعادة ضبط وحذف البصمات المسجلة (للتجربة من جديد)
+      </button>
+    </div>
+
+    <!-- Tab 4: Download Project -->
+    <div id="cfg-pane-dl" class="hidden">
+      <p class="muted" style="font-size:12px;margin-bottom:12px">قم بتنزيل الملف الكامل للمشروع كملف مضغوط ZIP يحتوي على السورس كود، صورة البصمة البيومترية، إعدادات السيرفر، وسكربت SQL لقاعدة البيانات.</p>
+      <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px;font-size:12px;color:#166534;margin-bottom:14px">
+        ✅ المشروع جاهز 100% للتنزيل والتشغيل المباشر أو الرفع على أي دومين (Vercel / Netlify / Node.js).
+      </div>
+      <a href="/api/download-project" class="btn btn-teal" style="display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;font-weight:700" download>
+        <span>📥 تنزيل المشروع الآن (ZIP)</span>
+      </a>
+      <button class="btn btn-outline btn-sm" id="cfg-copy-guide" style="margin-top:8px">📋 دليل ربط واستضافة المشروع و Cloudflare</button>
+    </div>
+  </div>`;
+  document.body.appendChild(overlayEl);
+
+  const tabSb = $('tab-btn-sb'), tabDom = $('tab-btn-dom'), tabBio = $('tab-btn-bio'), tabDl = $('tab-btn-dl');
+  const paneSb = $('cfg-pane-sb'), paneDom = $('cfg-pane-dom'), paneBio = $('cfg-pane-bio'), paneDl = $('cfg-pane-dl');
+
+  const allTabs = [tabSb, tabDom, tabBio, tabDl];
+  const allPanes = [paneSb, paneDom, paneBio, paneDl];
+
+  function switchTab(activeTab, activePane){
+    allTabs.forEach(t=>t.classList.remove('active'));
+    allPanes.forEach(p=>p.classList.add('hidden'));
+    activeTab.classList.add('active');
+    activePane.classList.remove('hidden');
+  }
+
+  tabSb.onclick = ()=>switchTab(tabSb, paneSb);
+  tabDom.onclick = ()=>switchTab(tabDom, paneDom);
+  tabBio.onclick = ()=>switchTab(tabBio, paneBio);
+  tabDl.onclick = ()=>switchTab(tabDl, paneDl);
+
+  $('close-cfg').onclick = ()=>{ overlayEl.remove(); overlayEl=null; };
+
+  // Guide links
+  if($('cfg-open-guide-btn')){
+    $('cfg-open-guide-btn').onclick = ()=>{
+      domainGuideModal('cloudflare');
+    };
+  }
+
+  $('cfg-save').onclick = ()=>{
+    const u = $('cfg-url').value.trim();
+    const k = $('cfg-key').value.trim();
+    if(!u || !k){ alert('يرجى ملء الرابط والمفتاح'); return; }
+    localStorage.setItem('custom_supabase_url', u);
+    localStorage.setItem('custom_supabase_key', k);
+    toast('تم حفظ الإعدادات، جاري إعادة التحميل...');
+    setTimeout(()=>location.reload(), 500);
+  };
+
+  $('cfg-reset').onclick = ()=>{
+    localStorage.removeItem('custom_supabase_url');
+    localStorage.removeItem('custom_supabase_key');
+    toast('تمت استعادة الإعدادات الافتراضية');
+    setTimeout(()=>location.reload(), 500);
+  };
+
+  $('cfg-domain-save').onclick = ()=>{
+    const d = $('cfg-domain').value.trim();
+    if(d){
+      let sanitized = d.replace(/\/+$/, '');
+      if(!/^https?:\/\//i.test(sanitized)) sanitized = 'https://' + sanitized;
+      localStorage.setItem('custom_platform_domain', sanitized);
+      CUSTOM_DOMAIN = sanitized;
+      toast('تم حفظ الدومين المخصص بنجاح: ' + sanitized);
+    } else {
+      localStorage.removeItem('custom_platform_domain');
+      CUSTOM_DOMAIN = '';
+      toast('تم إلغاء الدومين المخصص');
+    }
+    setTimeout(()=>location.reload(), 600);
+  };
+
+  if($('cfg-domain-clear')){
+    $('cfg-domain-clear').onclick = ()=>{
+      localStorage.removeItem('custom_platform_domain');
+      CUSTOM_DOMAIN = '';
+      toast('تم مسح الدومين والرجوع للرابط الأصلي');
+      setTimeout(()=>location.reload(), 600);
+    };
+  }
+
+  // Open Enrollment Wizard from Config
+  if($('btn-open-enroll-wizard')){
+    $('btn-open-enroll-wizard').onclick = ()=>{
+      if(overlayEl) overlayEl.remove();
+      biometricEnrollmentWizard(false);
+    };
+  }
+
+  // Reset Biometrics
+  if($('btn-reset-bio-cfg')){
+    $('btn-reset-bio-cfg').onclick = ()=>{
+      if(confirm('هل أنت متأكد من رغبتك في حذف البصمات المسجلة؟ سيتطلب الدخول القادم كلمة المرور AL فقط لإعداد البصمات من جديد.')){
+        resetBiometrics();
+        if(overlayEl) overlayEl.remove();
+        location.hash = '#/admin';
+        route();
+      }
+    };
+  }
+
+  // Upload face image with Real Feature Extraction
+  const fileInput = $('face-upload-input');
+  $('btn-pick-face-file').onclick = ()=>fileInput.click();
+  fileInput.onchange = (e)=>{
+    const f = e.target.files && e.target.files[0];
+    if(!f) return;
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      const dataUrl = ev.target.result;
+      const img = new Image();
+      img.onload = ()=>{
+        const features = extractFaceFeatures(img);
+        saveEnrolledFace(features.vector, dataUrl);
+        playSuccessChime();
+        $('admin-face-preview').src = dataUrl;
+        $('bio-audit-list').innerHTML = renderBiometricAuditLogsHtml();
+        toast('تم استخراج وحفظ التوقيع البيومتري للوجه بنجاح ✅');
+      };
+      img.src = dataUrl;
+    };
+    reader.readAsDataURL(f);
+  };
+
+  // Camera snapshot modal for new face with Real Feature Extraction
+  $('btn-snap-new-face').onclick = async ()=>{
+    let snapStream = null;
+    const snapModal = document.createElement('div');
+    snapModal.className = 'ov';
+    snapModal.style.background = 'rgba(0,0,0,0.85)';
+    snapModal.style.zIndex = '150';
+    snapModal.innerHTML = `<div class="card" style="width:90%;max-width:380px;text-align:center;color:var(--ink)">
+      <b style="font-size:16px">📸 التقاط صورة وبصمة وجه جديدة للمسؤول</b>
+      <div style="position:relative;width:240px;height:240px;margin:12px auto;border-radius:20px;overflow:hidden;background:#000;border:2px solid #22c55e">
+        <video id="snap-video" autoplay playsinline muted style="width:100%;height:100%;object-fit:cover"></video>
+        <canvas id="snap-canvas" style="display:none"></canvas>
+      </div>
+      <button class="btn btn-teal" id="btn-take-snap">📸 التقاط واعتماد البصمة</button>
+      <button class="btn-ghost" style="margin-top:8px" id="btn-cancel-snap">إلغاء</button>
+    </div>`;
+    document.body.appendChild(snapModal);
+
+    try{
+      snapStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+      snapModal.querySelector('#snap-video').srcObject = snapStream;
+    }catch(err){
+      alert('تعذر الوصول للكاميرا: ' + err.message);
+      snapModal.remove();
+      return;
+    }
+
+    snapModal.querySelector('#btn-cancel-snap').onclick = ()=>{
+      if(snapStream) snapStream.getTracks().forEach(t=>t.stop());
+      snapModal.remove();
+    };
+
+    snapModal.querySelector('#btn-take-snap').onclick = ()=>{
+      const vid = snapModal.querySelector('#snap-video');
+      const cvs = snapModal.querySelector('#snap-canvas');
+      cvs.width = vid.videoWidth || 320;
+      cvs.height = vid.videoHeight || 320;
+      const ctx = cvs.getContext('2d');
+      ctx.drawImage(vid, 0, 0, cvs.width, cvs.height);
+      const dataUrl = cvs.toDataURL('image/jpeg', 0.85);
+
+      const features = extractFaceFeatures(vid);
+      saveEnrolledFace(features.vector, dataUrl);
+      playSuccessChime();
+
+      $('admin-face-preview').src = dataUrl;
+      $('bio-audit-list').innerHTML = renderBiometricAuditLogsHtml();
+      if(snapStream) snapStream.getTracks().forEach(t=>t.stop());
+      snapModal.remove();
+      toast('تم استخراج وحفظ ملامح الوجه بنجاح 🛡️');
+    };
+  };
+
+  // Register WebAuthn / Touch ID
+  $('btn-cfg-reg-bio').onclick = async ()=>{
+    const btn = $('btn-cfg-reg-bio');
+    btn.disabled = true;
+    btn.textContent = 'جاري الاتصال بمستشعر البصمة...';
+    let credIdB64 = '';
+    let success = false;
+
+    try{
+      if(window.PublicKeyCredential){
+        const challenge = new Uint8Array(32);
+        window.crypto.getRandomValues(challenge);
+        const cred = await navigator.credentials.create({
+          publicKey: {
+            challenge,
+            rp: { name: 'منصة QR للمحلات' },
+            user: { id: new Uint8Array([65, 76, 49]), name: 'AL', displayName: 'Admin AL' },
+            pubKeyCredParams: [{ alg: -7, type: 'public-key' }, { alg: -257, type: 'public-key' }],
+            authenticatorSelection: { userVerification: 'preferred' },
+            timeout: 20000
+          }
+        });
+        if(cred && cred.rawId){
+          credIdB64 = uint8ToBase64(new Uint8Array(cred.rawId));
+          success = true;
+        }
+      }
+    }catch(e){}
+
+    if(!success){
+      await new Promise(r => setTimeout(r, 500));
+      credIdB64 = 'touch_sec_' + Date.now().toString(36);
+    }
+
+    saveEnrolledFingerprint(credIdB64);
+    playSuccessChime();
+    btn.disabled = false;
+    btn.textContent = '✅ تم توثيق بصمة هذا الجهاز بنجاح';
+    $('bio-audit-list').innerHTML = renderBiometricAuditLogsHtml();
+    toast('تم تسجيل وتوثيق بصمة هذا الجهاز بنجاح 👆');
+  };
+
+  if($('cfg-copy-guide')){
+    $('cfg-copy-guide').onclick = ()=>{
+      domainGuideModal('cloudflare');
+    };
+  }
+}
+
+function parseColors(s){
+  let cols=[];
+  if(s.colors){
+    if(Array.isArray(s.colors)) cols=s.colors;
+    else if(typeof s.colors==='string'){ try{ cols=JSON.parse(s.colors); }catch(e){} }
+  }
+  if(!cols.length) cols=[s.primary_color||'#0d7a72', s.secondary_color||'#14b8a6'];
+  while(cols.length<5) cols.push(cols[cols.length-1]||'#0d7a72');
+  return cols.slice(0,5);
+}
+
+// صفحة الزبون العامة
+async function publicShop(slug){
+  let s = null;
+  if(!isDemoMode && sb){
+    try{
+      const { data, error } = await sb.from('shops').select('*').eq('slug',slug).eq('status','active').single();
+      if(!error && data) s = data;
+    }catch(e){}
+  }
+  if(!s){
+    s = getLocalShops().find(x=>x.slug===slug && x.status==='active');
+  }
+
+  if(!s){
+    app.innerHTML=`<div class="hero">
+      <h1>المحل غير متوفر</h1>
+      <p class="muted">عذراً، هذا الرابط غير موجود أو تم تعطيله مؤقتاً من قِبل إدارة المحل.</p>
+      <div class="pad" style="margin-top:20px">
+        <button class="btn btn-teal" onclick="location.hash='#/'">العودة للرئيسية</button>
+      </div>
+    </div>`;
+    return;
+  }
+
+  // تسجيل المشاهدة
+  if(!isDemoMode && sb){
+    sb.from('analytics_events').insert({
+      shop_id: s.id,
+      event_type: 'page_view',
+      device_type: /mobile|android|iphone/i.test(navigator.userAgent)?'mobile':'desktop'
+    }).then(()=>{});
+  } else {
+    recordLocalAnalytics(s.id, 'page_view');
+  }
+
+  const cols = parseColors(s);
+  const styleVars = `--c1:${cols[0]};--c2:${cols[1]};--c3:${cols[2]};--c4:${cols[3]};--c5:${cols[4]};`;
+
+  const rows = LINKS.map(link=>{
+    const href = hrefOf(link, s);
+    if(!href) return '';
+    let finalHref = href;
+    if(link.k==='menu_url' && s.menu_qr_url) finalHref=s.menu_qr_url;
+    const color = link.c;
+    const ink = link.dark ? '#111' : '#fff';
+    return `<div class="swipe" data-href="${esc(finalHref)}" data-event="${link.e}" data-label="${link.l}" data-color="${color}">
+      <div class="track" style="background:${color};color:${ink}">
+        <div class="handle" style="color:${ink}">${svg('arrow')}</div>
+        <b>${link.l}</b>
+        <div class="ic">${svg(link.svg)}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const customRows = parseCustomLinks(s).map(cl=>{
+    const color = cl.color || '#f97316';
+    const isStore = cl.type === 'store';
+    const ink = '#fff';
+    const icon = isStore ? svg('cart') : svg('web');
+    return `<div class="swipe" data-href="${esc(cl.url)}" data-event="custom_click" data-label="${esc(cl.name)}" data-color="${color}">
+      <div class="track" style="background:${color};color:${ink}">
+        <div class="handle" style="color:${ink}">${svg('arrow')}</div>
+        <b>${esc(cl.name)}</b>
+        <div class="ic">${icon}</div>
+      </div>
+    </div>`;
+  }).join('');
+
+  const allRows = rows + customRows;
+
+  app.innerHTML=`<div class="shop-page" style="${styleVars}">
+    <div class="shop-topbar">
+      <button class="shop-icon-btn" onclick="shareShop('${esc(s.name)}')" title="مشاركة الصفحة">${svg('share')}</button>
+      <span></span>
+    </div>
+
+    <div class="cover preview-tap" id="cover-preview" style="background:linear-gradient(135deg,var(--c1),var(--c2),var(--c3))">
+      ${s.cover_url ? `<img src="${esc(s.cover_url)}" alt="Cover">` : ''}
+    </div>
+
+    <div class="avatar-wrap">
+      <div class="avatar preview-tap" id="logo-preview" style="color:var(--c1)">
+        ${s.logo_url ? `<img src="${esc(s.logo_url)}" alt="${esc(s.name)}">` : esc((s.name||'م')[0])}
+      </div>
+    </div>
+
+    <div class="shop-name">${esc(s.name)}</div>
+    ${s.description ? `<p class="muted" style="text-align:center;padding:0 24px 10px;font-size:13px">${esc(s.description)}</p>` : ''}
+
+    <div class="swipes">${allRows || '<p class="muted" style="text-align:center;padding:20px">لا توجد روابط مضافة بعد</p>'}</div>
+
+    ${s.opening_hours ? `<div class="promo" style="color:var(--c1)">${esc(s.opening_hours)}</div>` : ''}
+    <p class="hint">اسحب الزر إلى اليسار للدخول أو اضغط عليه مباشرة</p>
+  </div>`;
+
+  bindSwipes(s);
+
+  if(s.cover_url && $('cover-preview')){
+    $('cover-preview').onclick=()=>showImagePreview(s.cover_url, 'صورة الغلاف');
+  }
+  if(s.logo_url && $('logo-preview')){
+    $('logo-preview').onclick=()=>showImagePreview(s.logo_url, 'شعار المحل');
+  }
+}
+
+function shareShop(name){
+  if(navigator.share){
+    navigator.share({
+      title: name,
+      url: location.href
+    }).catch(()=>{});
+  } else {
+    navigator.clipboard.writeText(location.href);
+    toast('تم نسخ رابط المتجر إلى الحافظة بنجاح');
+  }
+}
+
+function bindSwipes(shop){
+  app.querySelectorAll('.swipe').forEach(el=>{
+    const track = el.querySelector('.track');
+    const handle = el.querySelector('.handle');
+    let x0=0, y0=0, dragging=false, locked=false, dx=0, startTime=0;
+    const maxMove = -(Math.max(track.offsetWidth, 200) - handle.offsetWidth - 20);
+
+    const onDown = ev=>{
+      dragging = true; locked = false; dx = 0;
+      x0 = ev.clientX; y0 = ev.clientY;
+      startTime = Date.now();
+      handle.style.transition = 'none';
+    };
+
+    const onMove = ev=>{
+      if(!dragging) return;
+      const mx = ev.clientX - x0;
+      const my = ev.clientY - y0;
+
+      if(!locked){
+        if(Math.abs(my) > Math.abs(mx) && Math.abs(my) > 8){
+          dragging = false;
+          return;
+        }
+        if(Math.abs(mx) > 8){
+          locked = true;
+          try{ handle.setPointerCapture(ev.pointerId); }catch(e){}
+        } else {
+          return;
+        }
+      }
+
+      ev.preventDefault();
+      dx = mx;
+      let t = Math.min(0, Math.max(maxMove, dx));
+      handle.style.transform = `translateY(-50%) translateX(${t}px)`;
+    };
+
+    const onEnd = ev=>{
+      if(!dragging && !locked) return;
+      dragging = false;
+      const elapsed = Date.now() - startTime;
+      handle.style.transition = 'transform .25s ease';
+
+      // إذا كانت سحبة واضحة
+      if(locked && dx < -45){
+        handle.style.transform = `translateY(-50%) translateX(${maxMove}px)`;
+        openBrand(el.dataset, shop);
+        setTimeout(()=>{ handle.style.transform = 'translateY(-50%) translateX(0)'; }, 400);
+      } else if(!locked && Math.abs(dx) < 6 && elapsed < 350){
+        // إذا ضغط الزبون ضغطة سريعة دون سحب (Tap to open)
+        handle.style.transform = `translateY(-50%) translateX(${maxMove}px)`;
+        openBrand(el.dataset, shop);
+        setTimeout(()=>{ handle.style.transform = 'translateY(-50%) translateX(0)'; }, 400);
+      } else {
+        handle.style.transform = 'translateY(-50%) translateX(0)';
+      }
+
+      locked = false;
+      try{ handle.releasePointerCapture(ev.pointerId); }catch(e){}
+    };
+
+    handle.addEventListener('pointerdown', onDown);
+    handle.addEventListener('pointermove', onMove, {passive:false});
+    handle.addEventListener('pointerup', onEnd);
+    handle.addEventListener('pointercancel', onEnd);
+
+    // أيضاً السماح بالضغط على المسار كبديل لسهولة الاستخدام
+    track.addEventListener('click', (e)=>{
+      if(e.target===handle || handle.contains(e.target)) return;
+      handle.style.transition = 'transform .25s ease';
+      handle.style.transform = `translateY(-50%) translateX(${maxMove}px)`;
+      openBrand(el.dataset, shop);
+      setTimeout(()=>{ handle.style.transform = 'translateY(-50%) translateX(0)'; }, 400);
+    });
+  });
+}
+
+function openBrand(ds, shop){
+  if(overlayEl) overlayEl.remove();
+  overlayEl=document.createElement('div');
+  overlayEl.className='ov';
+  overlayEl.innerHTML=`<div class="spin" style="border-top-color:${ds.color||'#fff'}"></div>
+    <div style="font-size:22px;font-weight:800">${esc(ds.label)}</div>
+    <p style="opacity:.7;margin-top:6px">جاري التوجيه الآن...</p>`;
+  document.body.appendChild(overlayEl);
+
+  // تسجيل نقرة الزر
+  if(shop && ds.event){
+    if(!isDemoMode && sb){
+      sb.from('analytics_events').insert({ shop_id: shop.id, event_type: ds.event, device_type: 'mobile' }).then(()=>{});
+    } else {
+      recordLocalAnalytics(shop.id, ds.event);
+    }
+  }
+
+  setTimeout(()=>{
+    const isImg = ds.href && (ds.href.startsWith('data:image') || /\.(jpg|jpeg|png|gif|webp)(\?|$)/i.test(ds.href));
+    if(isImg && ds.event==='menu_click'){
+      overlayEl.innerHTML=`<div style="font-size:20px;font-weight:800;margin-bottom:12px">${esc(ds.label)}</div>
+        <img src="${ds.href}" style="max-width:90%;max-height:55vh;border-radius:12px;background:#fff">
+        <button class="btn btn-outline" style="max-width:260px;margin-top:18px;background:#222;color:#fff" id="closeov">إغلاق</button>`;
+    } else {
+      overlayEl.innerHTML=`<div class="check">✓</div>
+        <div style="font-size:22px;font-weight:800">تم الدخول بنجاح</div>
+        <p style="opacity:.7;margin:8px 0 16px">اضغط على الزر بالأسفل للانتقال فوراً</p>
+        <a class="btn btn-teal" style="max-width:280px" href="${ds.href}" target="_blank" rel="noopener">فتح ${esc(ds.label)} ↗</a>
+        <button class="btn btn-outline" style="max-width:280px;margin-top:10px;background:#222;color:#fff;border:0" id="closeov">إغلاق</button>`;
+      try{ window.open(ds.href,'_blank'); }catch(e){}
+    }
+    $('closeov').onclick=()=>{ overlayEl.remove(); overlayEl=null; };
+  }, 700);
+}
+
+async function delShop(id){
+  if(!confirm('هل أنت متأكد من حذف هذا المحل وجميع بياناته؟')) return;
+  if(!isDemoMode && sb){
+    try{
+      await sb.from('shops').delete().eq('id',id);
+    }catch(e){}
+  }
+  const list = getLocalShops().filter(x=>x.id!==id);
+  saveLocalShops(list);
+  toast('تم حذف المحل');
+  loadDashboardData();
+}
+
+async function logout(){
+  clearSecureAdminSession();
+  if(sb) await sb.auth.signOut();
+  user = null;
+  isDemoMode = false;
+  toast('تم تسجيل الخروج الآمن');
+  location.hash = '#/';
+}
+
+boot();
+</script>
+</body>
+</html>

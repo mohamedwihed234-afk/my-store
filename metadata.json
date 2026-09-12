@@ -1,0 +1,6 @@
+{
+  "name": "منصة QR للمحلات",
+  "description": "منصة QR للمحلات - إدارة وعرض صفحات المحلات وروابط التواصل والمنيو عبر رموز QR",
+  "requestFramePermissions": ["camera"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
